@@ -1,0 +1,11 @@
+<?php
+
+function dcycle_test_name() {
+  $info_file = drupal_parse_info_file('sites/default/deploy.info');
+  return $info_file['test'];
+}
+
+function dcycle_module_name() {
+  $info_file = drupal_parse_info_file('sites/default/deploy.info');
+  return $info_file['module'];
+}

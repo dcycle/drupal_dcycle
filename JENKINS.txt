@@ -1,0 +1,38 @@
+Jenkins for continuous integration (CI)
+
+- Make sure your project follows dCycle guidelines and is available on a git
+  repo.
+- Install Jenkins (for example at http://localhost:8080/)
+- Go to http://localhost:8080/pluginManager/available and make sure
+  the Git Plugin and Jenkins Text Finder are available
+- Configure a new project (for example dcycle)
+- In the command line type (with your credentials):
+echo 'create database jenkins' | mysql -uroot -proot
+- Configure your Jenkins project: http://localhost:8080/job/dcycle/configure:
+ - advanced project options: set a custom workspace (for example if you
+   are using MAMP, it might be /Applications/MAMP/htdocs/dcycledemo_jenkins)
+   which you have access to via a web browser, and not its url (for example
+   http://localhost:8888/dcycledemo_jenkins)
+ - make sure the jenkins user is in a group that can write to the custom
+   workspace
+ - make sure the jenkins user has an ssh key, and that its public key is
+   recognized by your git server.
+ - sudo su jenkins and git clone <git-server> (for example git clone
+   git@github.com:you/yourproject.git)
+ - make sure that the server is added to the list of known hosts and
+   that you have read/write access.
+ - set source code management to git and enter your directory in read/write
+   format. In advanced, give it the name "main"
+ - set it to track the master branch
+ - In the build section add Execute shell:
+
+/path/to/drush si --db-url="mysql://root:root@localhost/jenkins" -y
+/path/to/drush en simpletest -y
+/path/to/drush en your_deploy_module -y
+php scripts/run-tests.sh --url "http://localhost:8888/dcycledemo_jenkins/" --verbose "your test group"
+
+ - In post build actions add:
+  - Jenkins text finder regular expression "[^0][1-9]* (fails|exceptions)" and "search the console"
+  - Git publisher: publish if succeeds, push to branch stage, Target remote name: "main" (which you selected previously)
+
+- Go back home and "build now".
