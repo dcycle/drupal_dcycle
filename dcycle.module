@@ -1,11 +1,147 @@
 <?php
 
-function dcycle_test_name() {
-  $info_file = drupal_parse_info_file('sites/default/deploy.info');
-  return $info_file['test'];
+/**
+ * @file
+ * Functions used during dCycle development.
+ * See http://dcycleproject.org/
+ */
+
+/**
+ * The version of dCycle
+ *
+ * Sites should state which version of dCycle they are using by
+ * setting the variable 'dcycle_version'. For example if you have
+ * activated the php module on your site, you are not compliant with
+ * later versions of dCycle and should set your 'dcycle_version'
+ * variable accordingly.
+ * The version of dCycle is not entirely correlated with the version
+ * of this module, but is correlated, because this module will
+ * perform checks for the latest version of the dCycle standard,
+ * which may not apply to the version you are using but which will
+ * nonetheless appear as errors on admin/reports/status.
+ * Please submit a patch if you would like certain checks to be
+ * performed only for certain versions of dCycle.
+ */
+function dcycle_version() {
+  return variable_get('dcycle_version', '1.0-dev');
 }
 
-function dcycle_module_name() {
-  $info_file = drupal_parse_info_file('sites/default/deploy.info');
-  return $info_file['module'];
+/**
+ * The version of the website
+ *
+ * See documentation/version.txt.
+ *
+ * @throws Exception
+ */
+function dcycle_site_version() {
+  $v = array();
+    
+  // First see if a version is defined in the .info file of the
+  // deployment module. It should be defined only if the code
+  // has already successfully passed the jenkins quality gate at
+  // least once.
+  if ($module = dcycle_deployment_module()) {
+    $info = drupal_parse_info_file(drupal_get_path('module', $module) . '/' . $module . '.info');
+    if (isset($info['version'])) {
+      $v[] = $info['version'];
+    }
+  }
+  // Add -dev to the version number if the environment is dev. For
+  // example v. 2013-01-01-dev contains untested code added after
+  // the 2013-01-01 version.
+  if (dcycle_environment_type() == 'dev') {
+    $v[] = dcycle_environment_type();
+  }
+  // This should never happen
+  if (!count($v)) {
+    throw new Exception('Environments that are not in dev or test should have versions assigned to them by Jenkins');
+  }
+  return implode('-', $v);
+}
+
+/**
+ * The environment type of this site.
+ *
+ * Most local environments will be dev, as will a common dev site.
+ * The production site, and probably staging as well, will be
+ * considered prod normally. Newly deployed environments are
+ * dev by default; you must set the variable dcycle_environement_type
+ * to prod if not. dev and prod are the only supported environment
+ * types
+ */
+function dcycle_environment_type() {
+  return variable_get('dcycle_environement_type', 'dev');
+}
+
+/**
+ * Get the deployment module name.
+ *
+ * Most local environments will be dev, as will a common dev site.
+ * The production site, and probably staging as well, will be
+ * considered prod normally. Newly deployed environments are
+ * dev by default; you must set the variable dcycle_environement_type
+ * to prod if not. dev and prod are the only supported environment
+ * types
+ *
+ * @throws Exception
+ */
+function dcycle_deployment_module() {
+  // there should be only one candidate
+  $candidates = array();
+  // find all candidate modules which adhere to
+  // sites/*/modules/custom/*_deploy
+  foreach (module_list() as $module) {
+    if (drupal_substr($module, drupal_strlen($module) - drupal_strlen('_deploy')) == '_deploy' && drupal_substr(drupal_get_path('module', $module), drupal_strlen(drupal_get_path('module', $module)) - drupal_strlen('/custom/' . $module)) == '/custom/' . $module) {
+      $candidates[] = $module;
+    }
+  }
+  switch (count($candidates)) {
+    case 0:
+      // Don't throw an exception if there are none. This is not really
+      // an error but a normal situation when dcycle is first installed.
+      return NULL;
+      break;
+    case 1:
+      // During normal development we'll have exactly one candidate
+      return $candidates[0];
+      break;
+    default:
+      // Any other count and an exception is thrown.
+      throw new Exception(t('There can\'t be more than one deployment module. Currently defined are @m', array('@m' => implode(', ', $candidates))));
+      break;
+  }
+}
+
+/**
+ * Implements hook_requirements().
+ *
+ * Requirements are the backbone of what is dCycle. For many of
+ * dCycle's requirements, checks are made here and the report
+ * can be found on admin/reports/status
+ */
+function dcycle_requirements() {
+  try {
+    $r['dcycle_version'] = array(
+      'title' => t('!d version', array('!d' => l(t('dCycle'), 'http://dcycleproject.org/'))),
+      'value' => dcycle_version(),
+      'severity' => REQUIREMENT_INFO,
+      'weight' => -2,
+    );
+    $site_version = dcycle_site_version();
+    $r['site_version'] = array(
+      'title' => t('Site version', array()),
+      'value' => $site_version?$site_version:'Not yet set, please set it',
+      'severity' => $site_version?REQUIREMENT_INFO:REQUIREMENT_ERROR,
+      'weight' => -1,
+    );
+  }
+  catch (Exception $e) {
+    $r['dcycle_exception'] = array(
+      'title' => $e->getMessage(),
+      'value' => '',
+      'severity' => REQUIREMENT_ERROR,
+      'weight' => -1,
+    );
+  }
+  return $r;
 }
