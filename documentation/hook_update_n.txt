@@ -1,0 +1,52 @@
+Hook Update N
+
+dCycle requires that the entire deployment and update procedure be completely automatic and tested. Deploying updates to code should always be achieved as follows:
+
+drush updb -y;drush cc all;drush cron
+
+Any step that needs to be done during update should be performed in code, in update hooks (called during drush updb).
+
+This includes:
+
+- reverting features
+- installing new modules
+- uninstalling modules
+- importing translations
+
+Example:
+
+/**
+ * Revert wysiwyg for my_feature
+ */
+function my_feature_update_7001() {
+  features_revert(array('my_feature' => array('wysiwyg')));
+}
+
+/**
+ * New dependency: dcycle for my_deploy
+ */
+function my_deploy_update_7001() {
+  module_enable(array('dcycle'));
+}
+
+/**
+ * Comment should be turned off
+ */
+function my_deploy_update_7002() {
+  module_disable(array('comment'));
+  drupal_uninstall_modules(array('comment'));
+}
+
+/**
+ * Importing some new French translations
+ */
+function my_deploy_update_7003() {
+  try {
+    $file = file_save_data(file_get_contents(realpath('sites/all/modules/translations/' . $filename)), 'public://po-import' . $filename . '.po');
+    _locale_import_po($file, 'fr', LOCALE_IMPORT_OVERWRITE, 'default');
+  }
+  catch (Exception $e) {
+    // don't break the update process for translations.
+    drupal_set_message(t('Oops, a translation did not work for @f. You must import it manually. Other updates will occur as expected.', array('@f' => $filename)));
+  }
+}

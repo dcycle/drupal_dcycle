@@ -1,0 +1,12 @@
+One-step deployment
+
+Central to dCycle is the idea of one-step deployment: a single module which should, when enabled on a brand-new Drupal site, provide a fully-deployed website sans content.
+
+This is used
+- by jenkins for testing
+- by developers new to the team
+- by current developers for "throw-away" or experimental environments
+- for the prod, stage and other environments.
+
+To this end you must provide exactly one module entitled sites/*/modules/custom/*_deploy; which is found by the function 
+dcycle_deployment_module().

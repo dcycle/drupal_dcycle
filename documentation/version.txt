@@ -1,0 +1,7 @@
+Setting your site version
+
+For dCycle, your site is a piece of deployable software and as such each
+environment is in a specific version.
+
+At the beginning of your project, your site will not have a version number,
+until the first commit is made by jenkins to the stage branch.

@@ -1,0 +1,12 @@
+dCycle projects use two branches: the master branch which can have anything it it, and the stage branch, managed exclusively by jenkins, which includes all code which passes the tests.
+
+When you develop you will use the master branch, and periodically:
+
+git pull origin master # to get your colleagues' work
+
+Jenkins will also update the .info file of your deployment module (each
+project must have exactly one deployment module), and this change will be
+committed to master and stage
+
+This means that master can potentially be in a state much more advanced than
+stage. Although it is preferable that this never happen, it is intentionally possible under dcycle. The development team is expected to communicate to avoid such a situation.
