@@ -1,0 +1,156 @@
+<?php
+
+/**
+ * @file
+ * Base simpletest fine-tuned for deployment. If you use this as a base
+ * for your own tests, please take example on tests/dcycle_base_self.test
+ * for how to check for the presence of this class before declaring your
+ * subclass; otherwise admin/config/development/testing will explode
+ * if you enable simpletest but not dcycle. The above is tested in
+ * tests/dcycle_base_self.test.
+ */
+
+class dCycleTestBase extends DrupalWebTestCase {
+  // User stack used by rememberUser() and returnToUser()
+  private $userStack;
+
+  /*
+   * Remembers the logged-in user before performing a task
+   *
+   * Calls to this can be embedded within one another. Example usage:
+   * - log in as user xyz
+   * - to perform a task you need to log in as admin, so call rememberUser().
+   * - xyz is now in memory, you can log in as admin
+   * - within your call to admin, you need to call a function which itself
+   *   needs to log in as admin. It will create a new admin user after calling
+   *   rememberUser() because it does not know that you are already logged in as
+   *   admin
+   * - after the above task, call return to user, which returns to your first
+   *   admin user.
+   * - after your first admin task ends, call return to user again, which
+   *   returns to xyz
+   *
+   * Use with returnToUser()
+   *
+   * Tested in tests/dcycle_base_self.test
+   */
+  protected function rememberUser() {
+    $stack = $this->getUserStack();
+    $this->userStack[] = $this->loggedInUser;
+  }
+
+  /**
+   * Get the user stack, for use with/by rememberUser() and getUserStack()
+   *
+   * Protected because sub-classes might need access to this, notably
+   * for testing purposes.
+   *
+   * @return
+   *   The remembered user stack as an array, the last in the stack being
+   *   the last user remembered.
+   *
+   * Tested in tests/dcycle_base_self.test
+   */
+  protected function getUserStack() {
+    if (!is_array($this->userStack)) {
+      $this->userStack = array();
+    }
+    return $this->userStack;
+  }
+
+  /*
+   * Returns to the previously set logged-in user after performing a task
+   * 
+   * Used with rememberUser() and can be embedded.
+   *
+   * Tested in tests/dcycle_base_self.test
+   */
+  protected function returnToUser() {
+    $stack = $this->getUserStack();
+    if (count($stack)) {
+      $account = $stack[count($stack) - 1];
+      unset($stack[count($stack) - 1]);
+      $this->userStack = $stack;
+      if ($account) {
+        $this->drupalLogin($account);
+      }
+      else {
+        $this->drupalLogout();
+      }
+    }
+    else {
+      $this->drupalLogout();
+    }
+  }
+
+  /**
+   * Login as an administrative user
+   *
+   * @return
+   *  The new administrative user object.
+   *
+   * Tested in tests/dcycle_base_self.test
+   */
+  function loginAdmin() {
+    $user = $this->drupalCreateUserForRole('administrator');
+    $this->drupalLogin($user);
+    return $user;
+  }
+
+  /**
+   * Create a user for a named role.
+   *
+   * @return
+   *  The new user object.
+   */
+  protected function drupalCreateUserForRole($role) {
+    // remember the current user because we'll need to log in with
+    // administrative powers to create the new user (we'll simulate the
+    // UI for this)
+    $user = $this->rememberUser();
+
+    // create a "user creator" user and log in.
+    $user_creator = $this->drupalCreateUser(array(
+      'administer users',
+      'administer permissions',
+    ));
+    $this->drupalLogin($user_creator);
+
+    // Go to the accounts admin page
+    $this->drupalGet('admin/people/create');
+    
+    // figure out the rid from the role name
+    $pattern = '/for="edit-roles-([1-9][0-9]*)">' . $role . '/';
+    $subject = $this->drupalGetContent();
+    $matches = array();
+    $this->assertTrue(preg_match($pattern, $subject, $matches), format_string('The role @r exists and matches are @m', array('@r' => $role, '@m' => serialize($matches))));
+
+    // get the role id from the name
+    $rid = $matches[1];
+    
+    // create a new user
+    $form = array(
+      'name' => $this->randomName(),
+      'mail' => $this->randomName() . '@example.com',
+      'pass' => user_password(),
+      'status' => 1,
+      'roles' => array($rid => $rid),
+    );
+    
+    $r = user_save(drupal_anonymous_user(), $form);
+
+    $this->assertTrue(!empty($r->uid), t('User created with name %name and pass %pass', array('%name' => $form['name'], '%pass' => $form['pass'])), t('User login'));
+    if (empty($r->uid)) {
+      return FALSE;
+    }
+
+    // Add the raw password so that we can log in as this user.
+    $r->pass_raw = $form['pass'];
+
+    // log is as the user we remembered previously
+    $this->returnToUser();
+    
+    // return
+    return $r;
+  }
+}

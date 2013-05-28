@@ -1,0 +1,55 @@
+<?php
+
+/**
+ * @file
+ * Simpletests for dCycle
+ */
+
+module_load_include('test', 'dcycle', 'tests/dcycle_base');
+
+if (!module_exists('dcycle')) {
+  drupal_set_message(t('Some tests are not shown because dcycle is not enabled'), 'warning', FALSE);
+  return;
+}
+
+class dCycleTestCase extends dCycleTestBase {
+  public function setUp() {
+    parent::setUp('dcycle');
+    // Use our mock object for dealing with stuff like the filesystem.
+    dcycle_mockable_set_type('mock');
+  }
+
+  public static function getInfo() {
+    return array(
+      'name' => 'dCycle functionality',
+      'description' => 'Test dCycle functionality.',
+      'group' => 'dCycle',
+    );
+  }
+
+  public function testApi() {
+    $expected = array(
+      $this->randomName(),
+    );
+    dcycle_mockable_set('dcycle', 'dCycleMockShell', 'setDrush', $expected[0]);
+    $this->assertTrue(dcycle_mockable('shell_exec', 'which drush') == $expected, 'Using our mock object, calling "which drush" on shell returns "/path/to/drush/drush" (' . serialize(dcycle_mockable('shell_exec', 'which drush')) . ').');
+  }
+
+  public function testDcycle() {
+    $this->loginAdmin();
+    $edit = array(
+      'dcycle_policy' => 'dcycle:dCycleQuickstartPolicy',
+      'dcycle_environment_type' => 'dev',
+      'dcycle_project_type' => 'website',
+    );
+    $this->drupalPost('admin/config/development/dcycle', $edit, 'Save configuration');
+    $this->assertNoText('Your deployment module is');
+    $this->assertText('You must create a deployment module');
+    dcycle_mockable_set('dcycle', 'dCycleMockModules', 'addModule', array(
+      'name' => 'whatever',
+    ));
+    $this->drupalGet('admin/config/development/dcycle');
+    $this->assertText('Your deployment module is');
+    $this->assertNoText('You must create a deployment module');
+  }
+}

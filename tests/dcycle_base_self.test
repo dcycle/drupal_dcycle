@@ -1,0 +1,98 @@
+<?php
+
+/**
+ * @file
+ * Test the functionality of the base test.
+ */
+
+module_load_include('test', 'dcycle', 'tests/dcycle_base');
+
+if (!module_exists('dcycle')) {
+  drupal_set_message(t('Some tests are not shown because dcycle is not enabled'), 'warning', FALSE);
+  return;
+}
+
+class dCycleTestBaseSelfTestCase extends dCycleTestBase {
+  public function setUp() {
+    parent::setUp();
+  }
+
+  public static function getInfo() {
+    return array(
+      'name' => 'dCycle test base functionality',
+      'description' => 'Test dCycle test base functionality.',
+      'group' => 'dCycle',
+    );
+  }
+
+  public function testSelf() {
+    $accounts = array(
+      $this->drupalCreateUser(),
+      $this->drupalCreateUser(),
+    );
+
+    $this->assertTrue($this->getUserStack() == array(), 'If no user has yet been remembered, the user stack is an array.');
+    $this->assertTrue($this->loggedInUser == FALSE, 'No logged in user yet.');
+    $this->returnToUser();
+    $this->assertTrue($this->loggedInUser == FALSE, 'If impossible to remember the previous user, log out.');
+    $this->drupalLogin($accounts[0]);
+    $this->rememberUser();
+    $this->drupalLogout();
+    $this->rememberUser();
+    $this->drupalLogin($accounts[1]);
+    $this->rememberUser();
+    $this->assertTrue($this->getUserStack() == array($accounts[0], FALSE, $accounts[1]), 'Our user stack now contains three users including an anonymous user represented by FALSE.');
+    $this->drupalLogin($this->drupalCreateUser());
+    $this->returnToUser();
+    $this->assertTrue($this->loggedInUser == $accounts[1], 'Remembering user returns to our account #1');
+    $this->returnToUser();
+    $this->assertTrue($this->loggedInUser == FALSE, 'Remembering user returns to the anonymous user');
+    $this->returnToUser();
+    $this->assertTrue($this->loggedInUser == $accounts[0], 'Remembering user returns to our user #0');
+  }
+
+}
+
+class dCycleNoDcycleModuleTestCase extends dCycleTestBase {
+  public function setUp() {
+    parent::setUp('simpletest');
+  }
+
+  public static function getInfo() {
+    return array(
+      'name' => 'dCycle not present on test screen',
+      'description' => 'Make sure admin/config/development/testing does not explode but gives an error message if dcycle is not enabled.',
+      'group' => 'dCycle',
+    );
+  }
+
+  public function testCase() {
+    $this->loginAdmin();
+    $this->drupalGet('admin/config/development/testing');
+    $this->assertText('Some tests are not shown because dcycle is not enabled', 'Rather than exploding, inform user that dcycle is not present');
+    $this->assertNoText('Test dCycle test base functionality.', 'Test cannot be displayed because it requires dcycle to be active for its parent class declaration');
+  }
+
+}
+
+class dCycleTestSubclassesTestCase extends dCycleTestBase {
+  public function setUp() {
+    parent::setUp('simpletest', 'dcycle');
+  }
+
+  public static function getInfo() {
+    return array(
+      'name' => 'dCycle present on test screen',
+      'description' => 'Make sure admin/config/development/testing works normally if dcycle is enabled.',
+      'group' => 'dCycle',
+    );
+  }
+
+  public function testCase() {
+    $this->loginAdmin();
+    $this->drupalGet('admin/config/development/testing');
+    $this->assertNoText('Some tests are not shown because dcycle is not enabled', 'dcycle now enabled, the warning should not appear');
+    $this->assertText('Test dCycle test base functionality.', 'Our test can be visible because dcycle is now enabled');
+  }
+
+}

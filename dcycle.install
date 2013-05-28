@@ -12,4 +12,6 @@ function dcycle_uninstall() {
   variable_del('dcycle_deployment_module');
   variable_del('dcycle_environment_type');
   variable_del('dcycle_version');
+  variable_del('dcycle_site_id');
+  variable_del('dcycle_policy');
 }

@@ -6,6 +6,39 @@
  * See http://dcycleproject.org/
  */
 
+define('DCYCLE_DEFAULT_POLICY', 'dCycleQuickstartPolicy');
+
+/**
+ * Implements hook_menu().
+ */
+function dcycle_menu() {
+  $items['admin/config/development/dcycle'] = array(
+    'title' => 'dCycle',
+    'description' => 'Manage development policies, mock objects, deployment, continuous integration, test-driven development, behaviour-driven development..',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('dcycle_settings'),
+    'access arguments' => array('administer site configuration'),
+    'file' => 'dcycle.admin.inc',
+  );
+
+  $items['admin/dcycle/identifier'] = array(
+    'page callback' => 'dcycle_menu_identifier_json',
+    'access callback' => TRUE,
+  );
+  return $items;
+}
+
+function dcycle_menu_identifier_json() {
+  die(drupal_json_encode(array('identifier' => dcycle_menu_identifier())));
+}
+
+function dcycle_menu_identifier() {
+  if (variable_get('dcycle_site_id', 'not set') == 'not set') {
+    variable_set('dcycle_site_id', rand(1000000000, 9999999999));
+  }
+  return variable_get('dcycle_site_id', 'not set');
+}
+
 /**
  * The version of dCycle
  *
@@ -70,7 +103,20 @@ function dcycle_site_version() {
  * types
  */
 function dcycle_environment_type() {
-  return variable_get('dcycle_environement_type', 'dev');
+  return variable_get('dcycle_environment_type', 'dev');
+}
+
+/**
+ * Get namespace
+ */
+function dcycle_namespace() {
+  $deployment_module = dcycle_deployment_module();
+  if ($deployment_module) {
+    return drupal_substr($deployment_module, 0, drupal_strlen($deployment_module) - drupal_strlen('_deploy'));
+  }
+  else {
+    return NULL;
+  }
 }
 
 /**
@@ -87,14 +133,8 @@ function dcycle_environment_type() {
  */
 function dcycle_deployment_module() {
   // there should be only one candidate
-  $candidates = array();
-  // find all candidate modules which adhere to
-  // sites/*/modules/custom/*_deploy
-  foreach (module_list() as $module) {
-    if (drupal_substr($module, drupal_strlen($module) - drupal_strlen('_deploy')) == '_deploy' && drupal_substr(drupal_get_path('module', $module), drupal_strlen(drupal_get_path('module', $module)) - drupal_strlen('/custom/' . $module)) == '/custom/' . $module) {
-      $candidates[] = $module;
-    }
-  }
+  $candidates = dcycle_mockable('deployment_modules');
+
   switch (count($candidates)) {
     case 0:
       // Don't throw an exception if there are none. This is not really
@@ -113,35 +153,214 @@ function dcycle_deployment_module() {
 }
 
 /**
+ * Returns the current policy. Check validity with dcycle_policy_exists().
+ *
+ * If you have selected a valid policy, then disabled the policy's associated
+ * module, this function may return an invalid policy.
+ *
+ * @return the module name and policy object name in a json format
+ */
+function dcycle_policy() {
+  $var_result = variable_get('dcycle_policy', 'dcycle:' . DCYCLE_DEFAULT_POLICY);
+
+  // we now need to return this as an array.
+  $var_array = explode(':', $var_result);
+  return array(
+    'module' => $var_array[0],
+    'class-name' => $var_array[1],
+  );
+}
+
+function dcycle_policy_exists($policy) {
+  $file = 'includes/dcycle_policies/' . $policy['class-name'] . '/' . $policy['class-name'];
+  module_load_include('inc', $policy['module'], $file);
+  return class_exists($policy['class-name']);
+}
+
+function dcycle_policy_key() {
+  $policy = dcycle_policy();
+  return $policy['module'] . ':' . $policy['class-name'];
+}
+
+/**
+ * Returns the current policy
+ *
+ * @return a dCycleBasePolicy object
+ *
+ * @throws Exception if the policy object cannot be created for any reason
+ */
+function dcycle_policy_object($policy = NULL) {
+  if (!$policy) {
+    $policy = dcycle_policy();
+  }
+  if (!module_exists($policy['module'])) {
+    throw new Exception('The module ' . $policy['module'] . ' does not exist or is not enabled');
+  }
+  $file = 'includes/dcycle_policies/' . $policy['class-name'] . '/' . $policy['class-name'];
+  if (!module_load_include('inc', $policy['module'], $file)) {
+    throw new Exception('The expected file ' . $file . ' does not exist in the module ' . $policy['module']);
+  }
+  if (class_exists($policy['class-name'])) {
+    return new $policy['class-name'];
+  }
+  else {
+    throw new Exception($policy['class-name'] . ' is not a class');
+  }
+}
+
+/**
+ * Return the available policies in a key => name array
+ *
+ * @return
+ *   An associative array of policy keys and policy names. The policy key
+ *   itself is in the format module:policyClass
+ */
+function dcycle_get_available_policies() {
+  // @TODO don't hardcode this
+  $policies = array(
+    'dcycle:dCycleQuickstartPolicy' => 'dCycle Quickstart policy',
+    'dcycle:dCyclePolicy' => 'dCycle policy',
+  );
+
+  // It is possible that another policy was selected, and then the
+  // module was disabled, in which case that policy is now selected
+  // but broken. It should still be listed as available.
+  if (!dcycle_policy_exists(dcycle_policy())) {
+    $policies = array_merge($policies, array(
+      dcycle_policy_key() => '[' . t('broken') . '] ' . dcycle_policy()['class-name'],
+    ));
+  }
+  return $policies;
+}
+
+/**
  * Implements hook_requirements().
  *
  * Requirements are the backbone of what is dCycle. For many of
  * dCycle's requirements, checks are made here and the report
  * can be found on admin/reports/status
+ *
+ * @param $info
+ *   An array which can contain the environment type, if different from
+ *   the current environment type. This is useful for live previews on
+ *   admin/config/development/dcycle
  */
-function dcycle_requirements() {
+function dcycle_requirements($phase) {
+  $requirements = array();
   try {
-    $r['dcycle_version'] = array(
-      'title' => t('!d version', array('!d' => l(t('dCycle'), 'http://dcycleproject.org/'))),
-      'value' => dcycle_version(),
-      'severity' => REQUIREMENT_INFO,
-      'weight' => -2,
-    );
-    $site_version = dcycle_site_version();
-    $r['site_version'] = array(
-      'title' => t('Site version', array()),
-      'value' => $site_version?$site_version:'Not yet set, please set it',
-      'severity' => $site_version?REQUIREMENT_INFO:REQUIREMENT_ERROR,
-      'weight' => -1,
-    );
+    $policy = dcycle_policy();
+    module_load_include('inc', 'dcycle', 'includes/dcycle_policies/' . $policy['class-name'] . '/' . $policy['class-name']);
+    $requirements = dCycleBasePolicy::_RenderedRequirements($policy);
   }
   catch (Exception $e) {
-    $r['dcycle_exception'] = array(
+    $requirements['dcycle_exception'] = array(
       'title' => $e->getMessage(),
       'value' => '',
       'severity' => REQUIREMENT_ERROR,
       'weight' => -1,
     );
   }
-  return $r;
+  return $requirements;
+}
+
+/**
+ * Get simpletest groups for a given module
+ */
+function dcycle_module_simpletests($module) {
+  $all_groups = simpletest_test_get_all();
+  $info = drupal_parse_info_file(drupal_get_path('module', $module) . '/' . $module . '.info');
+  $files = array();
+  if (isset($info['files']) && is_array($info['files'])) {
+    foreach ($info['files'] as $filename) {
+      if (substr($filename, strlen($filename) - strlen('.test'), strlen('.test')) == '.test') {
+        $files[] = drupal_get_path('module', $module) . '/' . $filename;
+      }
+    }
+  }
+  return $files;
+}
+
+/**
+ * Abstraction for a mockable function and its arguments.
+ *
+ * For example, you might want to interact with the shell from your
+ * module; i.e. you want to call shell_exec('which drush') and make sure
+ * drush exists on your system. Two problems arise for testing:
+ *
+ * (1) you can't control your system: do you have access to it? Are
+ *     you on a recognized OS? Is shell_exec() disabled in your php.ini?
+ * (2) how do you test for what happens when drush is, or is not enabled
+ *     in the PATH?
+ *
+ * Enter mock objects: instead of interacting directly with shell_exec(),
+ * you interact with an abstraction of shell_exec, which can be either
+ * your real environment, or, for testing, a mock environment that does
+ * whatever you want.
+ *
+ * For an example, ook at how this dcycle module implements mocking
+ * for shell_exec().
+ *
+ * @param $function
+ *   Name of a function which exists in your mockable class.
+ * @param $arguments
+ *   A single argument to pass to that function. (If you need more
+ *   than one, use an array).
+ *
+ * @return
+ *   The result of the current implementation of your mockable object.
+ *   the current implementation can be real implementation (the real-world
+ *   shell_exec(), in this example, on your host environment); or a mock
+ *   object. This function asks your base object to instantiate itself with
+ *   a subclass and then to call the requested function on its implementation.
+ *
+ * @throw Exception
+ *
+ * Tested in tests/dcycle.test
+ */
+function dcycle_mockable($function, $argument = NULL) {
+  // invoke hook_mockables 
+  $mockables = module_invoke_all('dcycle_mockables');
+
+  if (isset($mockables[$function])) {
+    // call the abstraction of the desired function
+    $module = $mockables[$function]['module'];
+    // the base class is also the name of the file to be included
+    $base_class = $mockables[$function]['base_class'];
+    // the real and the mock class must exist
+
+    // include the file and load an object of the class
+    module_load_include('inc', $module, 'includes/dcycle_mockable/' . $base_class);
+    $object = dCycleMockableBase::getMockable($base_class);
+
+    // return the function's result.
+    return $object->$function($argument);
+  }
+  else {
+    throw new Exception('Could not create mock object');
+  }
+}
+
+function dcycle_mockable_set_type($type, $more = array()) {
+  module_load_include('inc', 'dcycle', 'includes/dcycle_mockable/dCycleMockableBase');
+  dCycleMockableBase::setType($type, $more);
+}
+
+function dcycle_dcycle_mockables() {
+  $mockables = array();
+
+  $mockables['shell_exec'] = array(
+    'module' => 'dcycle',
+    'base_class' => 'dCycleMockableShell',
+  );
+  $mockables['deployment_modules'] = array(
+    'module' => 'dcycle',
+    'base_class' => 'dCycleMockableModules',
+  );
+
+  return $mockables;
+}
+
+function dcycle_mockable_set($module, $class, $function, $argument) {
+  module_load_include('inc', $module, 'includes/dcycle_mockable/' . $class);
+  $class::$function($argument);
 }
