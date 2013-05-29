@@ -66,4 +66,16 @@ abstract class dcycleBaseRule {
   function peerReviewChecklist() {
     return array();
   }
+
+  /**
+   * Check requirements, return TRUE if passed, FALSE if error
+   */
+  function checkReqs() {
+    foreach ($this->requirements() as $req => $info) {
+      if ($info['severity'] == REQUIREMENT_ERROR) {
+        return FALSE;
+      }
+    }
+    return TRUE;
+  }
 }

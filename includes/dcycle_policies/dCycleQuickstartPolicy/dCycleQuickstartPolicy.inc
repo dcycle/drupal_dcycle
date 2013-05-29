@@ -40,7 +40,28 @@ class dcycleQuickstartPolicy extends dcycleBasePolicy {
   }
 
   function getProjectType() {
-    return variable_get('dcycle_project_type', 'website');
+    return variable_get('dcycle_project_type', $this->discoverProjectType());
+  }
+
+  /**
+   * Attempt to figure out whether we are developing a module or website
+   *
+   * Jenkins should be able to determine this automatically based on
+   * - if exactly one module is under git, then assume that is the module we're
+   *   checking and developing
+   * - if not, assume we're developing a website.
+   * see http://drupal.org/node/2007096#comment-7473482
+   *
+   * @return
+   *   A project type, 'website' or 'module'
+   */
+  function discoverProjectType() {
+    if ($this->getRuleObject('dcycle', 'dcycleModuleDevRule')->checkReqs()) {
+      return 'module';
+    }
+    else {
+      return 'website';
+    }
   }
 
   function _getAttribute($name) {
