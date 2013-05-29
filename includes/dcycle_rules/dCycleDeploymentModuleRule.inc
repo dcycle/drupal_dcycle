@@ -20,6 +20,10 @@ class dcycleDeploymentModuleRule extends dcycleBaseRule {
     return in_array($this->getPolicyAttribute('project_type', array('equals' => array('website', 'module'))), array('website'));
   }
 
+  function deploymentModule() {
+    return dcycle_deployment_module();
+  }
+
   function _requirements() {
     $deployment_module = dcycle_deployment_module();
     $requirements['deployment_module'] = array(

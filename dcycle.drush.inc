@@ -72,9 +72,7 @@ function drush_dcycle_test() {
     drush_log('please set base_url in the settings file', 'error');
   }
 
-  foreach (dcycle_module_simpletests($module) as $file) {
-    dcycle_exec('cd ' . getcwd() . ';php scripts/run-tests.sh --verbose --color --file "' . $file . '"');
-  }
+  dcycle_policy_object()->testAll();
 }
 
 /**
@@ -103,7 +101,7 @@ function dcycle_exec($command) {
   variable_set('dcycle_command_durations', $durations);
   
   foreach ($output as $line) {
-   // drush_log($line, 'ok');
+    drush_log($line, 'ok');
   }
 }
 

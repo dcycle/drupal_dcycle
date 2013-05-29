@@ -23,13 +23,24 @@ class dcycleModuleDevRule extends dcycleBaseRule {
     return in_array($this->getPolicyAttribute('project_type', array('equals' => array('website', 'module'))), array('module'));
   }
 
+  function modulesUnderGit() {
+    $modules_under_git = array();
+
+    foreach (module_list() as $machine => $human) {
+      if (is_dir(DRUPAL_ROOT . '/' . drupal_get_path('module', $machine) . '/.git')) {
+        $modules_under_git[$machine] = $human;
+      }
+    }
+    return $modules_under_git;
+  }
+
   /**
    * Implements dcycleBaseRule::_requirements().
    */
   function _requirements() {
     $requirements = array();
 
-    $modules_under_git = array();
+    $modules_under_git = $this->modulesUnderGit();
 
     foreach (module_list() as $machine => $human) {
       if (is_dir(DRUPAL_ROOT . '/' . drupal_get_path('module', $machine) . '/.git')) {

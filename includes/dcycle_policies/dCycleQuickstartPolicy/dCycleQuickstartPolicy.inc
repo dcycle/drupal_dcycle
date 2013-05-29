@@ -73,7 +73,7 @@ class dcycleQuickstartPolicy extends dcycleBasePolicy {
         return $this->getProjectType();
         break;
       case 'simpletest_module_description':
-        return t('the deployment module');
+        return $this->getTargetModule();
         break;
       default:
         return NULL;
@@ -111,4 +111,26 @@ class dcycleQuickstartPolicy extends dcycleBasePolicy {
       return $this;
     }
   }
+
+  /**
+   * Return the target module for this environment
+   *
+   * Dcycle requires that there be exactly one target module:
+   * - 
+   */
+  function getTargetModule() {
+    $moduleDevRule = $this->getRuleObject('dcycle', 'dcycleModuleDevRule');
+    if ($moduleDevRule->checkReqs()) {
+      // we know there is only one because that is the requirement that
+      // was just checked
+      $modules_under_git = $moduleDevRule->modulesUnderGit();
+      foreach ($modules_under_git as $module_under_git => $human) {
+        return $module_under_git;
+      }
+    }
+    else {
+      return $this->getRuleObject('dcycle', 'dcycleDeploymentModuleRule')->deploymentModule();
+    }
+  }
+  
 }

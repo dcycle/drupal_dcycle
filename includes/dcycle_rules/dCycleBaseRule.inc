@@ -98,4 +98,12 @@ abstract class dcycleBaseRule {
     }
     return TRUE;
   }
+  
+  /**
+   * Test, called from the command line.
+   *
+   * Subclasses should override.
+   */
+  function test() {
+  }
 }

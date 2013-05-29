@@ -151,4 +151,17 @@ abstract class dcycleBasePolicy {
     }
     return $this;
   }
+
+  /**
+   * This is meant to be called from the command line because
+   * it uses exec(), which may be disabled for your webserver.
+   *
+   * To call this set up your environment in the GUI and then
+   * call drush dcycle-test in the command line.
+   */
+  function testAll() {
+    foreach ($this->getRules() as $rule) {
+      $rule->test();
+    }
+  }
 }
