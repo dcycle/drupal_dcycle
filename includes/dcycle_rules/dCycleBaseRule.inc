@@ -11,7 +11,7 @@ abstract class dcycleBaseRule {
     $this->policy = $policy;
   }
   function requirements() {
-    $requirements = array();
+    $return = array();
 
     // If this rule is not meant to be used for the policy in its current
     // state, then the requirement should not be returned.

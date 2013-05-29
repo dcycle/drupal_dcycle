@@ -20,6 +20,7 @@ class dcycleQuickstartPolicy extends dcycleBasePolicy {
       $this->getRuleObject('dcycle', 'dcycleDeploymentModuleRule'),
       $this->getRuleObject('dcycle', 'dcycleSimpletestRule'),
       $this->getRuleObject('dcycle', 'dcycleCoderReviewRule'),
+      $this->getRuleObject('dcycle', 'dcycleModuleDevRule'),
     );
   }
   function getVersion() {
@@ -37,10 +38,18 @@ class dcycleQuickstartPolicy extends dcycleBasePolicy {
     }
     return $return;
   }
+
+  function getProjectType() {
+    return variable_get('dcycle_project_type', 'website');
+  }
+
   function _getAttribute($name) {
     switch ($name) {
       case 'environment':
         return $this->getEnvironmentType();
+        break;
+      case 'project_type':
+        return $this->getProjectType();
         break;
       case 'simpletest_module_description':
         return t('the deployment module');
@@ -64,7 +73,7 @@ class dcycleQuickstartPolicy extends dcycleBasePolicy {
     $form['dcycle_project_type'] = array(
       '#type' => 'select',
       '#title' => t('Project type'),
-      '#default_value' => variable_get('dcycle_project_type', 'website'),
+      '#default_value' => $this->getProjectType(),
       '#options' => array(
         'website' => t('Website'),
         'module' => t('Module'),

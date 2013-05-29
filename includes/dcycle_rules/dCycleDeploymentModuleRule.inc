@@ -10,6 +10,16 @@ class dcycleDeploymentModuleRule extends dcycleBaseRule {
   function getName() {
     return 'A deployment module must exist and define the website\'s namespace, in the form sites/*/modules/custom/[namespace]_deploy.';
   }
+
+  /**
+   * Overrides dcycleBaseRule::usedForPolicy().
+   *
+   * Use this rule only for the dev environment.
+   */
+  function usedForPolicy() {
+    return in_array($this->getPolicyAttribute('project_type', array('equals' => array('website', 'module'))), array('website'));
+  }
+
   function _requirements() {
     $deployment_module = dcycle_deployment_module();
     $requirements['deployment_module'] = array(

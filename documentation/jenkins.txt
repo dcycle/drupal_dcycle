@@ -40,16 +40,12 @@ echo 'create database jenkins_[project_name]' | mysql -uroot -proot
    working together.
  - In the build section add Execute shell:
 
-/path/to/drush si --db-url="mysql://root:root@localhost/jenkins" -y
-/path/to/drush en simpletest coder_review your_module -y
+drush si --db-url="mysql://root:root@localhost/jenkins" -y
+drush en simpletest coder_review your_module -y
 
 You will have to add the optional:
 
-cd ../../../../
-
-if you are developing a module. This gets to you to the root. If you are developing a website you are already in the root.
-
-/path/to/drush dcycle-test
+drush dcycle-test
 
  - In post build actions add:
   - Console output (build log) parsing:

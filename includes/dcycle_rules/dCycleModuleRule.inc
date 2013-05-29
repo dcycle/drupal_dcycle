@@ -6,7 +6,7 @@
 
 abstract class dcycleModuleRule extends dcycleBaseRule {
   function getName() {
-    return format_plural(count($this->getModules()), 'The @m module is required to @required. Reason: @r', 'The modules @m are required to be @required. Reason: @r', array('@m' => implode(', ', $this->getModules()), '@required' => implode('; ', $this->getReqInfo()), '@r' => $this->getDescription()));
+    return format_plural(count($this->getModules()), 'The @m module is required to be @required. Reason: @r', 'The modules @m are required to be @required. Reason: @r', array('@m' => implode(', ', $this->getModules()), '@required' => implode('; ', $this->getReqInfo()), '@r' => $this->getDescription()));
   }
   function getModules() {
     return $this->_getModules();
