@@ -28,10 +28,20 @@ function dcycle_menu() {
   return $items;
 }
 
+/**
+ * Menu callback returning dcycle_menu_identifier() in the form of json.
+ */
 function dcycle_menu_identifier_json() {
   die(drupal_json_encode(array('identifier' => dcycle_menu_identifier())));
 }
 
+/**
+ * Gets a unique identifier for this environment.
+ *
+ * Used by drush dcycle-test to determine if the base_url in settings.php
+ * is actually the site we think it is, allowing us to avoid incomprehensible
+ * errors if it is not.
+ */
 function dcycle_menu_identifier() {
   if (variable_get('dcycle_site_id', 'not set') == 'not set') {
     variable_set('dcycle_site_id', rand(1000000000, 9999999999));
@@ -171,12 +181,34 @@ function dcycle_policy() {
   );
 }
 
+/**
+ * Returns the current policy. Check validity with dcycle_policy_exists().
+ *
+ * If you have selected a valid policy, then disabled the policy's associated
+ * module, this function may return an invalid policy.
+ *
+ * @policy
+ *   A policy in the form of an associative array with 'class-name' and
+ *   'module'.
+ *
+ * @return
+ *   TRUE if the policy exists
+ */
 function dcycle_policy_exists($policy) {
   $file = 'includes/dcycle_policies/' . $policy['class-name'] . '/' . $policy['class-name'];
   module_load_include('inc', $policy['module'], $file);
   return class_exists($policy['class-name']);
 }
 
+/**
+ * Returns the current policy in the form of a key.
+ *
+ * Used to create key value pairs where the key must be unique. This
+ * is used in select lists, for example.
+ *
+ * @return
+ *   A policy key in the format module:clasname
+ */
 function dcycle_policy_key() {
   $policy = dcycle_policy();
   return $policy['module'] . ':' . $policy['class-name'];
@@ -367,11 +399,25 @@ function dcycle_mockable($function, $argument = NULL) {
   }
 }
 
+/**
+ * Set the type of mockable object we need.
+ *
+ * param @type
+ *   can be 'real' or 'mock'
+ *
+ * param @more
+ *   if you need finer control over your environment, you can set
+ *   the $more parameter to what you want, and then use it within
+ *   your mock object.
+ */
 function dcycle_mockable_set_type($type, $more = array()) {
   module_load_include('inc', 'dcycle', 'includes/dcycle_mockable/dcycleMockableBase');
   dcycleMockableBase::setType($type, $more);
 }
 
+/**
+ * Implements hook_dcycle_mockables().
+ */
 function dcycle_dcycle_mockables() {
   $mockables = array();
 
@@ -387,8 +433,38 @@ function dcycle_dcycle_mockables() {
   return $mockables;
 }
 
+/**
+ * Allow control over the mock object.
+ *
+ * This is generally used during testing, or can be used during
+ * development as well to see how your site reacts when, for example,
+ * time() is exactly 1 a.m. (see the example with time() in the comments
+ * in dcycle_mockable())
+ *
+ * You can use this with, for exampele, dcycle_mockable_set('dcycle',
+ * 'dcycleMockShell', 'setDrush', 'whatever')
+ *
+ * The above, used in tests/dcycle.test, calls setDrush on dcycleMockShell,
+ * thereby simulating that in future calls, the system will act as though
+ * the path to drush in PATH is whatever.
+ *
+ * This may be preferable to calling the function directly because this
+ * throws an Exception if there is a problem instead of just dying; also
+ * it allows you to use one line instead of two.
+ *
+ * @param module
+ *   The module managing this mock object
+ * @param class
+ *   The class of the mock object.
+ * @param function
+ *   The function to call on the mock object.
+ * @param argument
+ *   The argument to pass to the function
+ *
+ * @throws DcycleException
+ */
 function dcycle_mockable_set($module, $class, $function, $argument) {
-  module_load_include('inc', $module, 'includes/dcycle_mockable/' . $class);
+  dcycle_load_include('inc', $module, 'includes/dcycle_mockable/' . $class);
   $class::$function($argument);
 }
 

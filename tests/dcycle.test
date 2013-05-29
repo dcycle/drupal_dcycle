@@ -5,20 +5,31 @@
  * Simpletests for dcycle
  */
 
+/**
+ * Make sure we don't explode if dcycle is not present.
+ */
 module_load_include('test', 'dcycle', 'tests/dcycle_base');
-
 if (!module_exists('dcycle')) {
   drupal_set_message(t('Some tests are not shown because dcycle is not enabled'), 'warning', FALSE);
   return;
 }
 
+/**
+ * Test that dcycle works as expected.
+ */
 class dcycleTestCase extends dcycleTestBase {
+  /**
+   * Overrides setUp().
+   */
   public function setUp() {
     parent::setUp('dcycle');
     // Use our mock object for dealing with stuff like the filesystem.
     dcycle_mockable_set_type('mock');
   }
 
+  /**
+   * Overrides getInfo().
+   */
   public static function getInfo() {
     return array(
       'name' => 'dcycle functionality',
@@ -27,6 +38,11 @@ class dcycleTestCase extends dcycleTestBase {
     );
   }
 
+  /**
+   * Test the API.
+   *
+   * Because this function starts with test..., it is called.
+   */
   public function testApi() {
     $expected = array(
       $this->randomName(),
@@ -35,6 +51,11 @@ class dcycleTestCase extends dcycleTestBase {
     $this->assertTrue(dcycle_mockable('shell_exec', 'which drush') == $expected, 'Using our mock object, calling "which drush" on shell returns "/path/to/drush/drush" (' . serialize(dcycle_mockable('shell_exec', 'which drush')) . ').');
   }
 
+  /**
+   * Test the admin screen.
+   *
+   * Because this function starts with test..., it is called.
+   */
   public function testDcycle() {
     $this->loginAdmin();
     $edit = array(
@@ -52,4 +73,5 @@ class dcycleTestCase extends dcycleTestBase {
     $this->assertText('Your deployment module is');
     $this->assertNoText('You must create a deployment module');
   }
+
 }

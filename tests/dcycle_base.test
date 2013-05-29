@@ -10,6 +10,15 @@
  * tests/dcycle_base_self.test.
  */
 
+/**
+ * Base test class for dcycle and other modules.
+ *
+ * Contains several utility functions which can be useful if you
+ * want to use dcycleTestBase instead of DrupalWebTestCase as a base for your
+ * own tests. If you do, please take example on tests/dcycle_base_self.test
+ * for how to check for the presence of this class before declaring your
+ * subclass
+ */
 class dcycleTestBase extends DrupalWebTestCase {
   // User stack used by rememberUser() and returnToUser()
   private $userStack;
@@ -153,4 +162,5 @@ class dcycleTestBase extends DrupalWebTestCase {
     // return
     return $r;
   }
+
 }

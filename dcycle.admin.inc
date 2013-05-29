@@ -27,14 +27,6 @@ function dcycle_settings() {
     '#description' => t('Select which policy you will be using for your development cycle. Different policies enforce different sets of rules.'),
   );
 
-  foreach ($form as $item => $info) {
-    $form[$item]['#ajax'] = array(
-      'callback' => '_dcycle_ajax_settings',
-      'wrapper' => '_dcycle_ajax_status_wrapper',
-      'method' => 'html',
-    );
-  }
-  
   $form['status'] = array(
     '#type' => 'fieldset',
     '#title' => t('Environment status'),
@@ -55,6 +47,9 @@ function dcycle_settings() {
   return system_settings_form($form);
 }
 
+/**
+ * Ajax callback for requirements on the administrative screen.
+ */
 function _dcycle_ajax_settings($form, $form_state) {
   // figure out the desired environment and project type.
   // The environment can be dev or prod; the project can

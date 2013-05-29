@@ -1,12 +1,14 @@
-The dcycle policy (different from the dcycle module, which can be used to enforce _any_ policy), use two branches:
+The dcycle policy is one of the policies you can use with dcycle. Here is how
+branching works in dCycle:
 
- - the master branch which can have anything it it
- - the stage branch, managed exclusively by jenkins, which includes all code which passes tests and other quality gates.
+- Continuous integration branches are used for code that is known to work (if the project is stable). You can have only one, master for example, or 7.x-1.x, or a few, 7.x-1.x, 7.x-2.x, 8.x-2.x for example.
 
-When you develop you will use the master branch, and periodically:
+- When using dcycle, you should not push to these branches (see http://drupal.org/node/2007158). Rather, push to unstable branches (for example unstable).
 
-git pull origin master # to get your colleagues' work
+- For each of your unstable branches, set up a jenkins job.
 
-Jenkins will also update the .info file of your deployment module (each
-project must have exactly one deployment module), and this change will be
-committed to master and stage
+- often do: git origin push unstable
+
+- Jenkins will be set up to check the unstable branch, and if tests pass, it will push to stable
+
+- When this happens, Jenkins will also update the .info file of your deployment module (each project must have exactly one deployment module), and this change will be committed to your stable and unstable branch.

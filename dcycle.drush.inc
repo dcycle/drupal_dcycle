@@ -77,6 +77,11 @@ function drush_dcycle_test() {
   }
 }
 
+/**
+ * Execute a command.
+ *
+ * This function also maintains a history of how long this normally takes.
+ */
 function dcycle_exec($command) {
   $output = array();
   $durations = variable_get('dcycle_command_durations', array());
@@ -102,13 +107,9 @@ function dcycle_exec($command) {
   }
 }
 
-
-function dcycle_drush_get_tests($modules) {
-  foreach ($modules as $module) {
-    drush_log('grabbing all tests for ' . $module, 'ok');
-  }
-}
-
+/**
+ * Make sure a command exists in the PATH.
+ */
 function _dcycle_check_command_exists($cmd, $why, $where) {
   if (_dcycle_command_exist($cmd)) {
     drush_log(dt('@cmd seems to be available for user @user.', array('@cmd' => $cmd, '@user' => get_current_user())), 'ok');

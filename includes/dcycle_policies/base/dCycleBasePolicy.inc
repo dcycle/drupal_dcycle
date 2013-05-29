@@ -5,6 +5,15 @@
  * Defines the dcycle policy
  */
 
+/**
+ * A base class for all policies.
+ *
+ * Policies are classes which define which rules and other information is
+ * required during development. In turn, Jenkins via drush dcycle-test check
+ * the policy of the module or website you are building, and makes sure all
+ * rules are respected, before merging your unstable branch to the stable
+ * branch.
+ */
 abstract class dcycleBasePolicy {
   function requirements() {
     include_once DRUPAL_ROOT . '/includes/install.inc';

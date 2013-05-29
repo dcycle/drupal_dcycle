@@ -2,21 +2,26 @@
 
 /**
  * @file
- * Test the functionality of the base test.
+ * Test the functionality of the base test. The base test contains
+ * functions developers may use as a base for their own simpletests.
  */
 
+// grab the base test.
 module_load_include('test', 'dcycle', 'tests/dcycle_base');
 
+// don't explode the test screen if dcycle is disabled.
 if (!module_exists('dcycle')) {
   drupal_set_message(t('Some tests are not shown because dcycle is not enabled'), 'warning', FALSE);
   return;
 }
 
+/**
+ * Test case for testing the base test class.
+ */
 class dcycleTestBaseSelfTestCase extends dcycleTestBase {
-  public function setUp() {
-    parent::setUp();
-  }
-
+  /**
+   * Overrides getInfo().
+   */
   public static function getInfo() {
     return array(
       'name' => 'dcycle test base functionality',
@@ -25,7 +30,17 @@ class dcycleTestBaseSelfTestCase extends dcycleTestBase {
     );
   }
 
+  /**
+   * Perform tests to see if the base methods work as expected.
+   *
+   * Because this method starts with the lowercase test..., it will
+   * be run.
+   */
   public function testSelf() {
+    // create a few users to see of the user stack works. The user stack is
+    // used when you have one user, and need to do the equivalent of asking
+    // another user with different permissions to do something, then come
+    // back to your user. See below for an example.
     $accounts = array(
       $this->drupalCreateUser(),
       $this->drupalCreateUser(),
@@ -53,11 +68,20 @@ class dcycleTestBaseSelfTestCase extends dcycleTestBase {
 
 }
 
+/**
+ * Test case for making sure the test screen does not explode if dcycle absent.
+ */
 class dcycleNoDcycleModuleTestCase extends dcycleTestBase {
+  /**
+   * Overrides setUp().
+   */
   public function setUp() {
     parent::setUp('simpletest');
   }
 
+  /**
+   * Overrides getInfo().
+   */
   public static function getInfo() {
     return array(
       'name' => 'dcycle not present on test screen',
@@ -66,6 +90,12 @@ class dcycleNoDcycleModuleTestCase extends dcycleTestBase {
     );
   }
 
+  /**
+   * Tests that the test screen does not explode if dcycle absent.
+   *
+   * Because this method starts with the lowercase test..., it will
+   * be run.
+   */
   public function testCase() {
     $this->loginAdmin();
     $this->drupalGet('admin/config/development/testing');
@@ -75,11 +105,20 @@ class dcycleNoDcycleModuleTestCase extends dcycleTestBase {
 
 }
 
+/**
+ * Test case for making sure tests show up if dcycle present.
+ */
 class dcycleTestSubclassesTestCase extends dcycleTestBase {
+  /**
+   * Overrides setUp().
+   */
   public function setUp() {
     parent::setUp('simpletest', 'dcycle');
   }
 
+  /**
+   * Overrides getInfo().
+   */
   public static function getInfo() {
     return array(
       'name' => 'dcycle present on test screen',
@@ -88,6 +127,12 @@ class dcycleTestSubclassesTestCase extends dcycleTestBase {
     );
   }
 
+  /**
+   * Makes sure our tests show up on the test screen if dcycle present.
+   *
+   * Because this method starts with the lowercase test..., it will
+   * be run.
+   */
   public function testCase() {
     $this->loginAdmin();
     $this->drupalGet('admin/config/development/testing');
