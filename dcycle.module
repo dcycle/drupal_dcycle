@@ -297,13 +297,36 @@ function dcycle_module_simpletests($module) {
  * your real environment, or, for testing, a mock environment that does
  * whatever you want.
  *
- * For an example, ook at how this dcycle module implements mocking
+ * For an example, look at how this dcycle module implements mocking
  * for shell_exec().
+ *
+ * To implement a mock object, follow these steps:
+ *
+ * (1) Determine what you want to mock, for example time(): during the
+ * normal course of execution in production, you want time() to return
+ * the real actual time (this is just meant as an example; in Drupal you
+ * would rarely call time(), using rather the REQUEST_TIME global)
+ *
+ * (2) In your code, instead of calling time(), call dcycle_mockable('time').
+ *
+ * (3) Implement hook_dcycle_mockables(), and make sure one of the keys is
+ * 'time'
+ *
+ * (4) The time key should include an array with the name of your module and
+ * the name of the time base class which resides in a file with the same name
+ * (see the description of hook_dcycle_mockables() for details).
+ *
+ * (5) In your mockable class file, implement the real time() implementation
+ * and the mock time implementation
+ *
+ * (6) If your application must do something special when time() is 1 a.m.
+ * exactly, you can mock this by adding functions to your mock subclass, and
+ * then in the testing code, set it.
  *
  * @param $function
  *   Name of a function which exists in your mockable class.
  * @param $arguments
- *   A single argument to pass to that function. (If you need more
+ *   A single optional argument to pass to that function. (If you need more
  *   than one, use an array).
  *
  * @return
@@ -313,7 +336,7 @@ function dcycle_module_simpletests($module) {
  *   object. This function asks your base object to instantiate itself with
  *   a subclass and then to call the requested function on its implementation.
  *
- * @throw Exception
+ * @throws Exception
  *
  * Tested in tests/dcycle.test
  */
@@ -329,14 +352,18 @@ function dcycle_mockable($function, $argument = NULL) {
     // the real and the mock class must exist
 
     // include the file and load an object of the class
-    module_load_include('inc', $module, 'includes/dcycle_mockable/' . $base_class);
+    dcycle_load_include('inc', $module, 'includes/dcycle_mockable/' . $base_class);
     $object = dcycleMockableBase::getMockable($base_class);
-
     // return the function's result.
-    return $object->$function($argument);
+    if (method_exists($object, $function)) {
+      return $object->$function($argument);
+    }
+    else {
+      throw new DcycleException(t('Please make sure the function @class::@function exists', array('@class' => get_class($object), '@function' => $function)));
+    }
   }
   else {
-    throw new Exception('Could not create mock object');
+    dcycle_exception('dcycle_mockable() was called with a function name (@f) that does not exist in module_invoke_all(\'dcycle_mockables\'). Make sure you are using mock objects correctly, see the description of dcycle_mockable().', array('@f' => $function));
   }
 }
 
@@ -363,4 +390,51 @@ function dcycle_dcycle_mockables() {
 function dcycle_mockable_set($module, $class, $function, $argument) {
   module_load_include('inc', $module, 'includes/dcycle_mockable/' . $class);
   $class::$function($argument);
+}
+
+/**
+ * Throws an exception and notes the calling function
+ *
+ * Use instead of throw new Exception(x) if you would like the calling function
+ * to appear in the message.
+ *
+ * @throws Exception, of course.
+ */
+class DcycleException extends Exception {
+  public function __construct($message) {
+    parent::__construct($message . ' ' . dcycle_calling_function(1));
+  }
+}
+
+/**
+ * Utility: Returns the calling function through a backtrace
+ *
+ * See http://mediatribe.net/en/node/68
+ */
+function dcycle_calling_function($level = 0) {
+  // a function x has called a function y which called this
+  // see http://stackoverflow.com/questions/190421/caller-function-in-php-5
+  $caller = debug_backtrace();
+  $caller = $caller[$level + 2];
+  $r = $caller['function'] . '()';
+  if (isset($caller['class'])) {
+    $r .= ' in ' . $caller['class'];
+  }
+  if (isset($caller['object'])) {
+    $r .= ' (' . get_class($caller['object']) . ')';
+  }
+  return '[' . $r . ']';
+}
+
+/**
+ * Utility function like module_load_include(), but throws Exception.
+ *
+ * See module_load_include() for details.
+ *
+ * @throws Exception
+ */
+function dcycle_load_include($type, $module, $file) {
+  if (!module_load_include($type, $module, $file)) {
+    throw new DcycleException('@module/@file.@type failed to load', array('@module' => $module, '@file' => $file, '@type' => $type));
+  }
 }

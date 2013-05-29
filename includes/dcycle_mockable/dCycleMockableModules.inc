@@ -1,7 +1,9 @@
 <?php
 
+module_load_include('inc', 'dcycle', 'includes/dcycle_mockable/dcycleMockableBase');
+
 abstract class dcycleMockableModules extends dcycleMockableBase {
-  abstract public function deployment_module();
+  abstract public function deployment_modules();
 
   public static function getConcreteClass() {
     $type = self::getType();
@@ -14,7 +16,7 @@ abstract class dcycleMockableModules extends dcycleMockableBase {
         return 'dcycleMockModules';
         break;
       default:
-        return NULL;
+        throw new DcycleException('Only the types real and mock are supported.');
         break;
     }
   }
@@ -25,7 +27,7 @@ class dcycleMockModules extends dcycleMockableModules {
   public static function setDeploymentModules($modules) {
     self::$deployment_modules = $modules;
   }
-  public function deployment_module() {
+  public function deployment_modules() {
     $return = array();
     if (self::$deployment_modules) {
       $return[] = self::$deployment_modules;
@@ -34,8 +36,8 @@ class dcycleMockModules extends dcycleMockableModules {
   }
 }
 
-class dcycleRealShell extends dcycleMockableShell {
-  public function deployment_module() {
+class dcycleRealModules extends dcycleMockableModules {
+  public function deployment_modules() {
     $candidates = array();
     // find all candidate modules which adhere to
     // sites/*/modules/custom/*_deploy

@@ -9,33 +9,52 @@ Jenkins for continuous integration (CI)
   the Git Plugin, post build task and Jenkins Text Finder are available
 - Configure a new project (for example dcycle)
 - In the command line type (with your credentials):
-echo 'create database jenkins' | mysql -uroot -proot
-- Configure your Jenkins project: http://localhost:8080/job/dcycle/configure:
+echo 'create database jenkins_[project_name]' | mysql -uroot -proot
+- Configure your Jenkins project: http://localhost:8080/job/[jobname]/configure:
  - advanced project options: set a custom workspace (for example if you
-   are using MAMP, it might be /Applications/MAMP/htdocs/dcycledemo_jenkins)
+   are using MAMP, it might be /Applications/MAMP/htdocs/dcycledemo_jenkins if
+   you are developing a website; or something like 
+   /Applications/MAMP/htdocs/dcycle_jenkins/sites/all/modules/jenkins
+   if you are developing a module)
    which you have access to via a web browser, and not its url (for example
    http://localhost:8888/dcycledemo_jenkins)
- - make sure the jenkins user is in a group that can write to the custom
-   workspace
+ - if you are developing a module or theme, and your working directory is a 
+   subdirectory of the drupal root, then set up your drupal root by downloading
+   drupal (don't install the db, though)
+ - if you are developing a module, add coder module to your drupal site if your
+   policy requires it.
+ - make sure the jenkins user can write to the custom
+   workspace recursively, and if your git repo is a subdirectory of a drupal, make sure jenkins can also write to sites/default.
  - make sure the jenkins user has an ssh key, and that its public key is
    recognized by your git server.
  - sudo su jenkins and git clone <git-server> (for example git clone
    git@github.com:you/yourproject.git)
  - make sure that the server is added to the list of known hosts and
-   that you have read/write access.
- - set source code management to git and enter your directory in read/write
-   format. In advanced, give it the name "main"
- - set it to track the master branch
+   that you have read/write access. This is done the first time your clone your
+   repo, make sure to do it over a trusted network.
+ - back to the jenkins UI:
+   set source code management to git and enter your directory in read/write
+   format. In advanced, give it the name "main", this will be important later
+   on.
+ - set it to track the branch associated with a given user or group of users
+   working together.
  - In the build section add Execute shell:
 
 /path/to/drush si --db-url="mysql://root:root@localhost/jenkins" -y
-/path/to/drush en simpletest coder_review your_deploy_module -y
+/path/to/drush en simpletest coder_review your_module -y
+
+You will have to add the optional:
+
+cd ../../../../
+
+if you are developing a module. This gets to you to the root. If you are developing a website you are already in the root.
+
 php scripts/run-tests.sh --url "http://localhost:8888/dcycledemo_jenkins/" --verbose "your test group"
 /path/to/drush coder-review demo_deploy --minor
 
  - In post build actions add:
-  - Jenkins text finder regular expression "[^0][1-9]*.(fails|exceptions|could not be found|normal warnings|minor warnings|ERROR)" and "search the console"
-  - Git publisher: publish if succeeds, push to branch stage, Target remote name: "main" (which you selected previously)
+  - (optional) Jenkins text finder regular expression "[^0][1-9]*.(fails|exceptions|could not be found|normal warnings|minor warnings|ERROR)" and "search the console"
+  - Git publisher: publish if succeeds, push to branch master (or whatever your CI branch is, 7.x-1.x for example if you are developing a drupal module), Target remote name: "main" (which you selected previously -- if you haven't yet saved, it will tell you main does not exist, save and come back to this page and the warning should disappear)
   - Console:
   
 cat sites/default/modules/custom/demo_deploy/demo_deploy.info | grep -v 'version' | grep -v ';following information inserted by the dcycle jenkins CI server' > sites/default/modules/custom/demo_deploy/demo_deploy.info.swp
@@ -46,3 +65,7 @@ mv sites/default/modules/custom/demo_deploy/demo_deploy.info.swp sites/default/m
 git commit -am $(date +%Y-%m-%d-%H:%M:%S)
 
 - Go back home and "build now".
+- Troubleshoot by going to the "console output"; add an issue to dcycle for support
+
+- Troubleshooting tips:
+ -- Many errors are permissions errors, make sure jenkins user can do whatever it has to. (Bring a sysadmin some cookies and ask him some questions).
