@@ -53,14 +53,15 @@ function drush_dcycle_test() {
   global $base_url;
   if ($base_url && $base_url != 'http://default') {
     drush_log('base_url is set in the settings file to ' . $base_url, 'ok');
+    $expected_identifier = dcycle_menu_identifier();
     $request = drupal_http_request($base_url . '/admin/dcycle/identifier');
     if (isset($request->data)) {
       $decoded = drupal_json_decode($request->data);
-      if ($decoded['identifier'] == dcycle_menu_identifier()) {
+      if ($decoded['identifier'] == $expected_identifier) {
         drush_log($base_url . ' and this site are one and the same', 'ok');
       }
       else {
-        drush_log('Cannot communicate with ' . $base_url . '; are you sure it is the same site as ' . getcwd() . '? ' . $base_url . '/admin/dcycle/identifier is expected to return ' . drupal_json_encode(array('identifier' => dcycle_menu_identifier())) . ' but returns ' . $request->data . ' instead.', 'error');
+        drush_log('Cannot communicate with ' . $base_url . '; are you sure it is the same site as ' . getcwd() . '? ' . $base_url . '/admin/dcycle/identifier is expected to return ' . drupal_json_encode(array('identifier' => $expected_identifier)) . ' but returns ' . $request->data . ' instead.', 'error');
       }
     }
     else {
