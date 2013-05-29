@@ -62,9 +62,9 @@ function drush_dcycle_test() {
       else {
         drush_log('Cannot communicate with ' . $base_url . '; are you sure it is the same site as ' . getcwd() . '? ' . $base_url . '/admin/dcycle/identifier is expected to return ' . drupal_json_encode(array('identifier' => dcycle_menu_identifier())) . ' but returns ' . $request->data . ' instead.', 'error');
       }
-      else {
-        drush_log('Cannot communicate with ' . $base_url . '/admin/dcycle/identifier.', 'error');
-      }
+    }
+    else {
+      drush_log('Cannot communicate with ' . $base_url . '/admin/dcycle/identifier.', 'error');
     }
   }
   else {
