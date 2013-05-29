@@ -49,8 +49,7 @@ cd ../../../../
 
 if you are developing a module. This gets to you to the root. If you are developing a website you are already in the root.
 
-php scripts/run-tests.sh --url "http://localhost:8888/dcycledemo_jenkins/" --verbose "your test group"
-/path/to/drush coder-review demo_deploy --minor
+/path/to/drush dcycle-test
 
  - In post build actions add:
   - (optional) Jenkins text finder regular expression "[^0][1-9]*.(fails|exceptions|could not be found|normal warnings|minor warnings|ERROR)" and "search the console"

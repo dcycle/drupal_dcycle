@@ -1,5 +1,7 @@
 <?php
 
+dcycle_load_include('inc', 'dcycle', 'includes/dcycle_mockable/dcycleMockableBase');
+
 abstract class dcycleMockableShell extends dcycleMockableBase {
   abstract public function shell_exec($command);
 
