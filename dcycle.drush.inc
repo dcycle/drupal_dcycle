@@ -60,7 +60,10 @@ function drush_dcycle_test() {
         drush_log($base_url . ' and this site are one and the same', 'ok');
       }
       else {
-        drush_log('Cannot communicate with ' . $base_url . '; are you sure it is the same site as ' . getcwd() . '? ' . $base_url . '/admin/dcycle/identifier is expected to return ' . dcycle_menu_identifier(), 'error');
+        drush_log('Cannot communicate with ' . $base_url . '; are you sure it is the same site as ' . getcwd() . '? ' . $base_url . '/admin/dcycle/identifier is expected to return ' . drupal_json_encode(array('identifier' => dcycle_menu_identifier())) . ' but returns ' . $request->data . ' instead.', 'error');
+      }
+      else {
+        drush_log('Cannot communicate with ' . $base_url . '/admin/dcycle/identifier.', 'error');
       }
     }
   }
