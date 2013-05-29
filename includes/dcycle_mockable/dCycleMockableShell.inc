@@ -1,6 +1,6 @@
 <?php
 
-abstract class dCycleMockableShell extends dCycleMockableBase {
+abstract class dcycleMockableShell extends dcycleMockableBase {
   abstract public function shell_exec($command);
 
   public static function getConcreteClass() {
@@ -8,10 +8,10 @@ abstract class dCycleMockableShell extends dCycleMockableBase {
 
     switch ($type) {
       case 'real':
-        return 'dCycleRealShell';
+        return 'dcycleRealShell';
         break;
       case 'mock':
-        return 'dCycleMockShell';
+        return 'dcycleMockShell';
         break;
       default:
         return NULL;
@@ -20,7 +20,7 @@ abstract class dCycleMockableShell extends dCycleMockableBase {
   }
 }
 
-class dCycleMockShell extends dCycleMockableShell {
+class dcycleMockShell extends dcycleMockableShell {
   private static $drush;
   public static function setDrush($drush) {
     self::$drush = $drush;
@@ -41,7 +41,7 @@ class dCycleMockShell extends dCycleMockableShell {
   }
 }
 
-class dCycleRealShell extends dCycleMockableShell {
+class dcycleRealShell extends dcycleMockableShell {
   public function shell_exec($command) {
     return shell_exec($command);
   }

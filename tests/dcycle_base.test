@@ -10,7 +10,7 @@
  * tests/dcycle_base_self.test.
  */
 
-class dCycleTestBase extends DrupalWebTestCase {
+class dcycleTestBase extends DrupalWebTestCase {
   // User stack used by rememberUser() and returnToUser()
   private $userStack;
 

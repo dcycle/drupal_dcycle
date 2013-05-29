@@ -18,7 +18,7 @@
 
 - visit admin/config/development/dcycle
 
-- select dCycle Quickstart as your policy
+- select dcycle Quickstart as your policy
 
 - the environment type will be set to Development by default, which is what you need when starting a project. 
 
@@ -26,7 +26,7 @@
 
 - If you are developing a website, create a deployment module at sites/default/modules/custom/[namespace]_deploy. [namespace] should contain only lowercase letters.
 
-- If you are developing a module or theme, create it and let dCycle know what it is.
+- If you are developing a module or theme, create it and let dcycle know what it is.
 
 - Function and unit testing of javascript fallback: your deployment module will need a simpletest to go with it. Follow the instructions on-screen.
 
@@ -54,7 +54,7 @@ sudo su jenkins
 
 - Follow instructions to also make it run.
 
-- Go to admin/config/development/dcycle/jenkins, and follow the instructions therein to create a new Jenkins project which tracks dCycle.
+- Go to admin/config/development/dcycle/jenkins, and follow the instructions therein to create a new Jenkins project which tracks dcycle.
 
 - Jenkins should automatically run, or you can click "Build now".
 
@@ -74,7 +74,7 @@ sudo su jenkins
 
 (takes about a day)
 
-- Go to admin/config/development/dcycle, and change your policy to dCycle full
+- Go to admin/config/development/dcycle, and change your policy to dcycle full
 
 - In the mock objects section, click New mock object... and follow the instructions on-screen. Go through the examples once until you are comfortable with the concepts.
 

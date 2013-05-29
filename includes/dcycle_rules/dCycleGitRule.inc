@@ -4,18 +4,18 @@
  * @file
  */
 
-module_load_include('inc', 'dcycle', 'includes/dcycle_rules/dCycleBaseRule');
+module_load_include('inc', 'dcycle', 'includes/dcycle_rules/dcycleBaseRule');
 
-class dCycleGitRule extends dCycleBaseRule {
+class dcycleGitRule extends dcycleBaseRule {
   /**
-   * Overrides dCycleBaseRule::getName().
+   * Overrides dcycleBaseRule::getName().
    */
   function getName() {
     return 'Git must be enabled for your project.';
   }
 
   /**
-   * Overrides dCycleBaseRule::usedForPolicy().
+   * Overrides dcycleBaseRule::usedForPolicy().
    *
    * Use this rule only for the dev environment.
    */
@@ -24,7 +24,7 @@ class dCycleGitRule extends dCycleBaseRule {
   }
 
   /**
-   * Implements dCycleBaseRule::_requirements().
+   * Implements dcycleBaseRule::_requirements().
    */
   function _requirements() {
     $requirements = array();

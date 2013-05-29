@@ -2,18 +2,18 @@
 
 /**
  * @file
- * Functions used during dCycle development.
+ * Functions used during dcycle development.
  * See http://dcycleproject.org/
  */
 
-define('DCYCLE_DEFAULT_POLICY', 'dCycleQuickstartPolicy');
+define('DCYCLE_DEFAULT_POLICY', 'dcycleQuickstartPolicy');
 
 /**
  * Implements hook_menu().
  */
 function dcycle_menu() {
   $items['admin/config/development/dcycle'] = array(
-    'title' => 'dCycle',
+    'title' => 'dcycle',
     'description' => 'Manage development policies, mock objects, deployment, continuous integration, test-driven development, behaviour-driven development..',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('dcycle_settings'),
@@ -40,20 +40,20 @@ function dcycle_menu_identifier() {
 }
 
 /**
- * The version of dCycle
+ * The version of dcycle
  *
- * Sites should state which version of dCycle they are using by
+ * Sites should state which version of dcycle they are using by
  * setting the variable 'dcycle_version'. For example if you have
  * activated the php module on your site, you are not compliant with
- * later versions of dCycle and should set your 'dcycle_version'
+ * later versions of dcycle and should set your 'dcycle_version'
  * variable accordingly.
- * The version of dCycle is not entirely correlated with the version
+ * The version of dcycle is not entirely correlated with the version
  * of this module, but is correlated, because this module will
- * perform checks for the latest version of the dCycle standard,
+ * perform checks for the latest version of the dcycle standard,
  * which may not apply to the version you are using but which will
  * nonetheless appear as errors on admin/reports/status.
  * Please submit a patch if you would like certain checks to be
- * performed only for certain versions of dCycle.
+ * performed only for certain versions of dcycle.
  */
 function dcycle_version() {
   return variable_get('dcycle_version', '1.0-dev');
@@ -185,7 +185,7 @@ function dcycle_policy_key() {
 /**
  * Returns the current policy
  *
- * @return a dCycleBasePolicy object
+ * @return a dcycleBasePolicy object
  *
  * @throws Exception if the policy object cannot be created for any reason
  */
@@ -218,8 +218,8 @@ function dcycle_policy_object($policy = NULL) {
 function dcycle_get_available_policies() {
   // @TODO don't hardcode this
   $policies = array(
-    'dcycle:dCycleQuickstartPolicy' => 'dCycle Quickstart policy',
-    'dcycle:dCyclePolicy' => 'dCycle policy',
+    'dcycle:dcycleQuickstartPolicy' => 'dcycle Quickstart policy',
+    'dcycle:dcyclePolicy' => 'dcycle policy',
   );
 
   // It is possible that another policy was selected, and then the
@@ -236,8 +236,8 @@ function dcycle_get_available_policies() {
 /**
  * Implements hook_requirements().
  *
- * Requirements are the backbone of what is dCycle. For many of
- * dCycle's requirements, checks are made here and the report
+ * Requirements are the backbone of what is dcycle. For many of
+ * dcycle's requirements, checks are made here and the report
  * can be found on admin/reports/status
  *
  * @param $info
@@ -250,7 +250,7 @@ function dcycle_requirements($phase) {
   try {
     $policy = dcycle_policy();
     module_load_include('inc', 'dcycle', 'includes/dcycle_policies/' . $policy['class-name'] . '/' . $policy['class-name']);
-    $requirements = dCycleBasePolicy::_RenderedRequirements($policy);
+    $requirements = dcycleBasePolicy::_RenderedRequirements($policy);
   }
   catch (Exception $e) {
     $requirements['dcycle_exception'] = array(
@@ -330,7 +330,7 @@ function dcycle_mockable($function, $argument = NULL) {
 
     // include the file and load an object of the class
     module_load_include('inc', $module, 'includes/dcycle_mockable/' . $base_class);
-    $object = dCycleMockableBase::getMockable($base_class);
+    $object = dcycleMockableBase::getMockable($base_class);
 
     // return the function's result.
     return $object->$function($argument);
@@ -341,8 +341,8 @@ function dcycle_mockable($function, $argument = NULL) {
 }
 
 function dcycle_mockable_set_type($type, $more = array()) {
-  module_load_include('inc', 'dcycle', 'includes/dcycle_mockable/dCycleMockableBase');
-  dCycleMockableBase::setType($type, $more);
+  module_load_include('inc', 'dcycle', 'includes/dcycle_mockable/dcycleMockableBase');
+  dcycleMockableBase::setType($type, $more);
 }
 
 function dcycle_dcycle_mockables() {
@@ -350,11 +350,11 @@ function dcycle_dcycle_mockables() {
 
   $mockables['shell_exec'] = array(
     'module' => 'dcycle',
-    'base_class' => 'dCycleMockableShell',
+    'base_class' => 'dcycleMockableShell',
   );
   $mockables['deployment_modules'] = array(
     'module' => 'dcycle',
-    'base_class' => 'dCycleMockableModules',
+    'base_class' => 'dcycleMockableModules',
   );
 
   return $mockables;

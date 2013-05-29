@@ -6,7 +6,7 @@
 /**
  * For testing, never use random data in subclasses
  */
-abstract class dCycleMockableBase {
+abstract class dcycleMockableBase {
   // return an object which is an instance of a subclass
   // of the abstract $class, depending on the context,
   // 'real' or 'mock'

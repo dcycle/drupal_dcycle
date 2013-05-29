@@ -1,6 +1,6 @@
 <?php
 
-abstract class dCycleMockableModules extends dCycleMockableBase {
+abstract class dcycleMockableModules extends dcycleMockableBase {
   abstract public function deployment_module();
 
   public static function getConcreteClass() {
@@ -8,10 +8,10 @@ abstract class dCycleMockableModules extends dCycleMockableBase {
 
     switch ($type) {
       case 'real':
-        return 'dCycleRealModules';
+        return 'dcycleRealModules';
         break;
       case 'mock':
-        return 'dCycleMockModules';
+        return 'dcycleMockModules';
         break;
       default:
         return NULL;
@@ -20,7 +20,7 @@ abstract class dCycleMockableModules extends dCycleMockableBase {
   }
 }
 
-class dCycleMockModules extends dCycleMockableModules {
+class dcycleMockModules extends dcycleMockableModules {
   private static $deployment_modules;
   public static function setDeploymentModules($modules) {
     self::$deployment_modules = $modules;
@@ -34,7 +34,7 @@ class dCycleMockModules extends dCycleMockableModules {
   }
 }
 
-class dCycleRealShell extends dCycleMockableShell {
+class dcycleRealShell extends dcycleMockableShell {
   public function deployment_module() {
     $candidates = array();
     // find all candidate modules which adhere to

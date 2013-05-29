@@ -2,15 +2,15 @@
 
 /**
  * @file
- * Defines the dCycle policy
+ * Defines the dcycle policy
  */
 
-abstract class dCycleBasePolicy {
+abstract class dcycleBasePolicy {
   function requirements() {
     include_once DRUPAL_ROOT . '/includes/install.inc';
     $requirements = array();
     $requirements['dcycle_version'] = array(
-      'title' => t('!d version', array('!d' => l(t('dCycle'), 'http://dcycleproject.org/'))),
+      'title' => t('!d version', array('!d' => l(t('dcycle'), 'http://dcycleproject.org/'))),
       'value' => dcycle_version(),
       'severity' => REQUIREMENT_INFO,
       'weight' => -2,

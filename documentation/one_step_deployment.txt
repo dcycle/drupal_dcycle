@@ -1,6 +1,6 @@
 One-step deployment
 
-Central to dCycle is the idea of one-step deployment: a single module which should, when enabled on a brand-new Drupal site, provide a fully-deployed website sans content.
+Central to dcycle is the idea of one-step deployment: a single module which should, when enabled on a brand-new Drupal site, provide a fully-deployed website sans content.
 
 This is used
 - by jenkins for testing

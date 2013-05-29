@@ -2,10 +2,10 @@
 
 /**
  * @file
- * Defines the dCycle policy
+ * Defines the dcycle policy
  */
 
-abstract class dCycleBaseRule {
+abstract class dcycleBaseRule {
   private $policy;
   function __construct($policy) {
     $this->policy = $policy;

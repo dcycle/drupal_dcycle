@@ -1,4 +1,4 @@
-name = dCycle
+name = dcycle
 description = A building code for Drupal.
 package = Development
 core = 7.x

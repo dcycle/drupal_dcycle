@@ -4,9 +4,9 @@
  * @file
  */
 
-module_load_include('inc', 'dcycle', 'includes/dcycle_rules/dCycleModuleRule');
+module_load_include('inc', 'dcycle', 'includes/dcycle_rules/dcycleModuleRule');
 
-class dCycleCoderReviewRule extends dCycleModuleRule {
+class dcycleCoderReviewRule extends dcycleModuleRule {
   function _getModules() {
     return array('coder_review');
   }

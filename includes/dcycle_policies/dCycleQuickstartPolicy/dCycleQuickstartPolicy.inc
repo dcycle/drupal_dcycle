@@ -2,31 +2,31 @@
 
 /**
  * @file
- * Defines the dCycle policy
+ * Defines the dcycle policy
  */
 
-module_load_include('inc', 'dcycle', 'includes/dcycle_policies/base/dCycleBasePolicy');
+module_load_include('inc', 'dcycle', 'includes/dcycle_policies/base/dcycleBasePolicy');
 
-class dCycleQuickstartPolicy extends dCycleBasePolicy {
+class dcycleQuickstartPolicy extends dcycleBasePolicy {
   private $info;
   function __construct($info = array()) {
     $this->info = $info;
   }
   function _getRules() {
     return array(
-      $this->getRuleObject('dcycle', 'dCycleEnvironmentRule'),
-      $this->getRuleObject('dcycle', 'dCycleSimpletestRule'),
-      $this->getRuleObject('dcycle', 'dCycleSiteVersionRule'),
-      $this->getRuleObject('dcycle', 'dCycleDeploymentModuleRule'),
-      $this->getRuleObject('dcycle', 'dCycleSimpletestRule'),
-      $this->getRuleObject('dcycle', 'dCycleCoderReviewRule'),
+      $this->getRuleObject('dcycle', 'dcycleEnvironmentRule'),
+      $this->getRuleObject('dcycle', 'dcycleSimpletestRule'),
+      $this->getRuleObject('dcycle', 'dcycleSiteVersionRule'),
+      $this->getRuleObject('dcycle', 'dcycleDeploymentModuleRule'),
+      $this->getRuleObject('dcycle', 'dcycleSimpletestRule'),
+      $this->getRuleObject('dcycle', 'dcycleCoderReviewRule'),
     );
   }
   function getVersion() {
     return 'dev';
   }
   function getName() {
-    return 'dCycle';
+    return 'dcycle';
   }
   function getEnvironmentType() {
     if (isset($this->info['environment'])) {
@@ -75,7 +75,7 @@ class dCycleQuickstartPolicy extends dCycleBasePolicy {
   }
   function policyFromForm($form) {
     if (isset($form['dcycle_environment_type']['#value'])) {
-      return new dCyclePolicy(array('environment' => $form['dcycle_environment_type']['#value']));
+      return new dcyclePolicy(array('environment' => $form['dcycle_environment_type']['#value']));
     }
     else {
       return $this;

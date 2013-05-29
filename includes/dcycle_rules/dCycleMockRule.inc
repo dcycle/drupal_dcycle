@@ -4,18 +4,18 @@
  * @file
  */
 
-module_load_include('inc', 'dcycle', 'includes/dcycle_rules/dCycleBaseRule');
+module_load_include('inc', 'dcycle', 'includes/dcycle_rules/dcycleBaseRule');
 
-class dCycleMockRule extends dCycleBaseRule {
+class dcycleMockRule extends dcycleBaseRule {
   /**
-   * Overrides dCycleBaseRule::getName().
+   * Overrides dcycleBaseRule::getName().
    */
   function getName() {
     return 'Mock objects must be properly used.';
   }
 
   /**
-   * Overrides dCycleBaseRule::peerReviewChecklist().
+   * Overrides dcycleBaseRule::peerReviewChecklist().
    */
   function peerReviewChecklist() {
     return array(

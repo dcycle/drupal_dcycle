@@ -4,9 +4,9 @@
  * @file
  */
 
-module_load_include('inc', 'dcycle', 'includes/dcycle_rules/dCycleBaseRule');
+module_load_include('inc', 'dcycle', 'includes/dcycle_rules/dcycleBaseRule');
 
-class dCycleEnvironmentRule extends dCycleBaseRule {
+class dcycleEnvironmentRule extends dcycleBaseRule {
   function getName() {
     return 'Every environment must be of type dev or prod';
   }

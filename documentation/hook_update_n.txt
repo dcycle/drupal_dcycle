@@ -1,6 +1,6 @@
 Hook Update N
 
-dCycle requires that the entire deployment and update procedure be completely automatic and tested. Deploying updates to code should always be achieved as follows:
+dcycle requires that the entire deployment and update procedure be completely automatic and tested. Deploying updates to code should always be achieved as follows:
 
 drush updb -y;drush cc all;drush cron
 

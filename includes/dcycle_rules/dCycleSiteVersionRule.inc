@@ -4,9 +4,9 @@
  * @file
  */
 
-module_load_include('inc', 'dcycle', 'includes/dcycle_rules/dCycleBaseRule');
+module_load_include('inc', 'dcycle', 'includes/dcycle_rules/dcycleBaseRule');
 
-class dCycleSiteVersionRule extends dCycleBaseRule {
+class dcycleSiteVersionRule extends dcycleBaseRule {
   function getName() {
     return 'The site version corresponds to the deployment module version, and the suffix -dev in the development environment.';
   }

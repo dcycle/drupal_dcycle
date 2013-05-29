@@ -4,9 +4,9 @@
  * @file
  */
 
-module_load_include('inc', 'dcycle', 'includes/dcycle_rules/dCycleBaseRule');
+module_load_include('inc', 'dcycle', 'includes/dcycle_rules/dcycleBaseRule');
 
-class dCycleSimpletestRule extends dCycleBaseRule {
+class dcycleSimpletestRule extends dcycleBaseRule {
   function getName() {
     return t('Simpletests must be defined for @modules', array('@modules' => $this->getPolicyAttribute('simpletest_module_description', array('type' => 'string'))));
   }

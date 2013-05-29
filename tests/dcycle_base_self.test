@@ -12,16 +12,16 @@ if (!module_exists('dcycle')) {
   return;
 }
 
-class dCycleTestBaseSelfTestCase extends dCycleTestBase {
+class dcycleTestBaseSelfTestCase extends dcycleTestBase {
   public function setUp() {
     parent::setUp();
   }
 
   public static function getInfo() {
     return array(
-      'name' => 'dCycle test base functionality',
-      'description' => 'Test dCycle test base functionality.',
-      'group' => 'dCycle',
+      'name' => 'dcycle test base functionality',
+      'description' => 'Test dcycle test base functionality.',
+      'group' => 'dcycle',
     );
   }
 
@@ -53,16 +53,16 @@ class dCycleTestBaseSelfTestCase extends dCycleTestBase {
 
 }
 
-class dCycleNoDcycleModuleTestCase extends dCycleTestBase {
+class dcycleNoDcycleModuleTestCase extends dcycleTestBase {
   public function setUp() {
     parent::setUp('simpletest');
   }
 
   public static function getInfo() {
     return array(
-      'name' => 'dCycle not present on test screen',
+      'name' => 'dcycle not present on test screen',
       'description' => 'Make sure admin/config/development/testing does not explode but gives an error message if dcycle is not enabled.',
-      'group' => 'dCycle',
+      'group' => 'dcycle',
     );
   }
 
@@ -70,21 +70,21 @@ class dCycleNoDcycleModuleTestCase extends dCycleTestBase {
     $this->loginAdmin();
     $this->drupalGet('admin/config/development/testing');
     $this->assertText('Some tests are not shown because dcycle is not enabled', 'Rather than exploding, inform user that dcycle is not present');
-    $this->assertNoText('Test dCycle test base functionality.', 'Test cannot be displayed because it requires dcycle to be active for its parent class declaration');
+    $this->assertNoText('Test dcycle test base functionality.', 'Test cannot be displayed because it requires dcycle to be active for its parent class declaration');
   }
 
 }
 
-class dCycleTestSubclassesTestCase extends dCycleTestBase {
+class dcycleTestSubclassesTestCase extends dcycleTestBase {
   public function setUp() {
     parent::setUp('simpletest', 'dcycle');
   }
 
   public static function getInfo() {
     return array(
-      'name' => 'dCycle present on test screen',
+      'name' => 'dcycle present on test screen',
       'description' => 'Make sure admin/config/development/testing works normally if dcycle is enabled.',
-      'group' => 'dCycle',
+      'group' => 'dcycle',
     );
   }
 
@@ -92,7 +92,7 @@ class dCycleTestSubclassesTestCase extends dCycleTestBase {
     $this->loginAdmin();
     $this->drupalGet('admin/config/development/testing');
     $this->assertNoText('Some tests are not shown because dcycle is not enabled', 'dcycle now enabled, the warning should not appear');
-    $this->assertText('Test dCycle test base functionality.', 'Our test can be visible because dcycle is now enabled');
+    $this->assertText('Test dcycle test base functionality.', 'Our test can be visible because dcycle is now enabled');
   }
 
 }

@@ -1,4 +1,4 @@
-The dCycle policy (different from the dCycle module, which can be used to enforce _any_ policy), use two branches:
+The dcycle policy (different from the dcycle module, which can be used to enforce _any_ policy), use two branches:
 
  - the master branch which can have anything it it
  - the stage branch, managed exclusively by jenkins, which includes all code which passes tests and other quality gates.
