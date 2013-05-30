@@ -29,6 +29,9 @@ abstract class dcycleMockableBase {
 
   static private $type;
 
+  /**
+   * Get the type, normally either real or mock
+   */
   static function getType() {
     if (!self::$type) {
       self::$type = 'real';
@@ -36,6 +39,9 @@ abstract class dcycleMockableBase {
     return self::$type;
   }
 
+  /**
+   * Set the type, normally either real or mock
+   */
   static function setType($type) {
     self::$type = $type;
   }

@@ -490,6 +490,9 @@ function dcycle_mockable_set($module, $file, $class, $function, $argument) {
  * @throws Exception, of course.
  */
 class DcycleException extends Exception {
+  /**
+   * Construct the exception by adding the calling function to it.
+   */
   public function __construct($message) {
     parent::__construct($message . ' ' . dcycle_calling_function(1));
   }
