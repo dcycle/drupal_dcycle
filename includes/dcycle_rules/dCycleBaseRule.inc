@@ -41,6 +41,8 @@ abstract class dcycleBaseRule {
    * will consider that we are developing a module.
    */
   function allRequirements() {
+    // this include defines REQUIREMENT_... constants.
+    include_once DRUPAL_ROOT . '/includes/install.inc';
     $return = array();
     $requirements = $this->_requirements();
     if (!is_array($requirements)) {

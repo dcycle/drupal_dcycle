@@ -23,7 +23,12 @@ class dcycleModuleDevRule extends dcycleBaseRule {
     return in_array($this->getPolicyAttribute('project_type', array('equals' => array('website', 'module'))), array('module'));
   }
 
-  function modulesUnderGit() {
+  /**
+   * Implements dcycleBaseRule::_requirements().
+   */
+  function _requirements() {
+    $requirements = array();
+
     $modules_under_git = array();
 
     foreach (module_list() as $machine => $human) {
@@ -31,25 +36,7 @@ class dcycleModuleDevRule extends dcycleBaseRule {
         $modules_under_git[$machine] = $human;
       }
     }
-    return $modules_under_git;
-  }
 
-  /**
-   * Implements dcycleBaseRule::_requirements().
-   */
-  function _requirements() {
-    $requirements = array();
-
-    $modules_under_git = $this->modulesUnderGit();
-
-    foreach (module_list() as $machine => $human) {
-      if (is_dir(DRUPAL_ROOT . '/' . drupal_get_path('module', $machine) . '/.git')) {
-        $modules_under_git[$machine] = $human;
-      }
-    }
-    
-    // this include defines REQUIREMENT_... constants.
-    include_once DRUPAL_ROOT . '/includes/install.inc';
     $requirements['dcycle_module_development'] = array(
       'title' => t('Module under development'),
       'value' => implode(', ', $modules_under_git),

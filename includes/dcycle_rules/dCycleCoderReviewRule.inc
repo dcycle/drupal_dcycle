@@ -19,10 +19,12 @@ class dcycleCoderReviewRule extends dcycleModuleRule {
   function getEnvironmentsOff() {
     return array('prod');
   }
+
+  /**
+   * Overrides dcycleBaseRule::test().
+   */
   function test() {
     $policy_attr = $this->getPolicyAttribute('simpletest_module_description', array('type' => 'string'));
-    foreach ($files as $file) {
-      dcycle_exec('drush coder-review --minor --comment --security ' . $policy_attr);
-    }
+    dcycle_exec('drush coder-review --minor --comment --security ' . $policy_attr);
   }
 }

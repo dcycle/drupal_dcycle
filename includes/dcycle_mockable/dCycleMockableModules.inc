@@ -3,7 +3,7 @@
 module_load_include('inc', 'dcycle', 'includes/dcycle_mockable/dcycleMockableBase');
 
 abstract class dcycleMockableModules extends dcycleMockableBase {
-  abstract public function deployment_modules();
+  abstract public function modules();
 
   public static function getConcreteClass() {
     $type = self::getType();
@@ -23,29 +23,35 @@ abstract class dcycleMockableModules extends dcycleMockableBase {
 }
 
 class dcycleMockModules extends dcycleMockableModules {
-  private static $deployment_modules;
-  public static function setDeploymentModules($modules) {
-    self::$deployment_modules = $modules;
+  /**
+   * List of mock active modules.
+   */
+  private static $modules;
+
+  /**
+   * Add a module to the mock list of modules.
+   *
+   * This can be used during testing or development to see how the system
+   * reacts to the existence of a particular module.
+   *
+   * @param $module
+   *   A module in the format array('machine' => 'human')
+   */
+  public function addModule($module) {
+    self::$modules = array_merge(self::$modules, $module);
   }
-  public function deployment_modules() {
+
+  public function modules() {
     $return = array();
-    if (self::$deployment_modules) {
-      $return[] = self::$deployment_modules;
+    if (self::$modules) {
+      $return = self::$modules;
     }
     return $return;
   }
 }
 
 class dcycleRealModules extends dcycleMockableModules {
-  public function deployment_modules() {
-    $candidates = array();
-    // find all candidate modules which adhere to
-    // sites/*/modules/custom/*_deploy
-    foreach (module_list() as $module) {
-      if (drupal_substr($module, drupal_strlen($module) - drupal_strlen('_deploy')) == '_deploy' && drupal_substr(drupal_get_path('module', $module), drupal_strlen(drupal_get_path('module', $module)) - drupal_strlen('/custom/' . $module)) == '/custom/' . $module) {
-        $candidates[] = $module;
-      }
-    }
-    return $candidates;
+  public function modules() {
+    return module_list();
   }
 }

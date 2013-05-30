@@ -26,7 +26,7 @@ function hook_dcycle_mockables() {
     'module' => 'dcycle',
     'base_class' => 'dcycleMockableShell',
   );
-  $mockables['deployment_modules'] = array(
+  $mockables['modules'] = array(
     'module' => 'dcycle',
     'base_class' => 'dcycleMockableModules',
   );

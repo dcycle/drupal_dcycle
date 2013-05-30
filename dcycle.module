@@ -142,8 +142,21 @@ function dcycle_namespace() {
  * @throws Exception
  */
 function dcycle_deployment_module() {
+  // get all modules. We are using dcycle_mockable here so that, during
+  // testing and developing, we can simulate the presence of absence of
+  // certain modules
+  $modules = dcycle_mockable('modules');
+
   // there should be only one candidate
-  $candidates = dcycle_mockable('deployment_modules');
+  $candidates = array();
+  // find all candidate modules which adhere to
+  // sites/*/modules/custom/*_deploy
+  foreach ($modules as $module) {
+    if (drupal_substr($module, drupal_strlen($module) - drupal_strlen('_deploy')) == '_deploy' && drupal_substr(drupal_get_path('module', $module), drupal_strlen(drupal_get_path('module', $module)) - drupal_strlen('/custom/' . $module)) == '/custom/' . $module) {
+      $candidates[] = $module;
+    }
+  }
+  return $candidates;
 
   switch (count($candidates)) {
     case 0:
@@ -425,7 +438,7 @@ function dcycle_dcycle_mockables() {
     'module' => 'dcycle',
     'base_class' => 'dcycleMockableShell',
   );
-  $mockables['deployment_modules'] = array(
+  $mockables['modules'] = array(
     'module' => 'dcycle',
     'base_class' => 'dcycleMockableModules',
   );
@@ -442,7 +455,7 @@ function dcycle_dcycle_mockables() {
  * in dcycle_mockable())
  *
  * You can use this with, for exampele, dcycle_mockable_set('dcycle',
- * 'dcycleMockShell', 'setDrush', 'whatever')
+ * ''dcycleMockableShell', 'dcycleMockShell', 'setDrush', 'whatever')
  *
  * The above, used in tests/dcycle.test, calls setDrush on dcycleMockShell,
  * thereby simulating that in future calls, the system will act as though
@@ -463,8 +476,8 @@ function dcycle_dcycle_mockables() {
  *
  * @throws DcycleException
  */
-function dcycle_mockable_set($module, $class, $function, $argument) {
-  dcycle_load_include('inc', $module, 'includes/dcycle_mockable/' . $class);
+function dcycle_mockable_set($module, $file, $class, $function, $argument) {
+  dcycle_load_include('inc', $module, 'includes/dcycle_mockable/' . $file);
   $class::$function($argument);
 }
 
@@ -511,6 +524,6 @@ function dcycle_calling_function($level = 0) {
  */
 function dcycle_load_include($type, $module, $file) {
   if (!module_load_include($type, $module, $file)) {
-    throw new DcycleException('@module/@file.@type failed to load', array('@module' => $module, '@file' => $file, '@type' => $type));
+    throw new DcycleException(t('@module/@file.@type failed to load', array('@module' => $module, '@file' => $file, '@type' => $type)));
   }
 }

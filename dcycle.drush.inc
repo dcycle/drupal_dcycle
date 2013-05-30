@@ -83,7 +83,7 @@ function drush_dcycle_test() {
 function dcycle_exec($command) {
   $output = array();
   $durations = variable_get('dcycle_command_durations', array());
-  drush_log('About to call ' . $command . ' with ' . $durations[md5($command)]['time'], 'ok');
+  drush_log('About to call ' . $command, 'ok');
   if (!isset($durations[md5($command)]['time'])) {
     drush_log('Not sure how long this will take.');
     $durations[md5($command)] = array(

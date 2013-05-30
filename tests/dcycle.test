@@ -44,11 +44,9 @@ class dcycleTestCase extends dcycleTestBase {
    * Because this function starts with test..., it is called.
    */
   public function testApi() {
-    $expected = array(
-      $this->randomName(),
-    );
-    dcycle_mockable_set('dcycle', 'dcycleMockShell', 'setDrush', $expected[0]);
-    $this->assertTrue(dcycle_mockable('shell_exec', 'which drush') == $expected, 'Using our mock object, calling "which drush" on shell returns "/path/to/drush/drush" (' . serialize(dcycle_mockable('shell_exec', 'which drush')) . ').');
+    $expected = $this->randomName();
+    dcycle_mockable_set('dcycle', 'dcycleMockableShell', 'dcycleMockShell', 'setDrush', $expected);
+    $this->assertMockEquals('shell_exec', 'which drush', array($expected));
   }
 
   /**
@@ -66,8 +64,8 @@ class dcycleTestCase extends dcycleTestBase {
     $this->drupalPost('admin/config/development/dcycle', $edit, 'Save configuration');
     $this->assertNoText('Your deployment module is');
     $this->assertText('You must create a deployment module');
-    dcycle_mockable_set('dcycle', 'dcycleMockModules', 'addModule', array(
-      'name' => 'whatever',
+    dcycle_mockable_set('dcycle', 'dcycleMockableModules', 'dcycleMockModules', 'addModule', array(
+      'machine' => 'human',
     ));
     $this->drupalGet('admin/config/development/dcycle');
     $this->assertText('Your deployment module is');
