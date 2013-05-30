@@ -136,7 +136,12 @@ abstract class dcycleBaseRule {
    * Test, called from the command line.
    *
    * Subclasses should override.
+   *
+   * @param $drushObject
+   *   An object as defined in dcycle.drush.inc, which you can
+   *   call to get drush environment information such as
+   *   simulate.
    */
-  function test() {
+  function test($drushObject) {
   }
 }

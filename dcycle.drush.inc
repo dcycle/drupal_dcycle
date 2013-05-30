@@ -88,7 +88,13 @@ function drush_dcycle_test() {
     drush_log('please set base_url in the settings file', 'error');
   }
 
-  dcycle_policy_object()->testAll();
+  dcycle_policy_object()->testAll(new drushObject);
+}
+
+class drushObject {
+  function simulate() {
+    return drush_get_context('DRUSH_SIMULATE');
+  }
 }
 
 /**
@@ -96,28 +102,34 @@ function drush_dcycle_test() {
  *
  * This function also maintains a history of how long this normally takes.
  */
-function dcycle_exec($command) {
-  $output = array();
-  $durations = variable_get('dcycle_command_durations', array());
-  drush_log('About to call ' . $command, 'ok');
-  if (!isset($durations[md5($command)]['time'])) {
-    drush_log('Not sure how long this will take.');
-    $durations[md5($command)] = array(
-      'time' => 0,
-      'count' => 0,
-    );
+function dcycle_exec($command, $drushObject = NULL) {
+  if ($drushObject && $drushObject->simulate()) {
+    drush_log('Simulating command call', 'ok');
+    drush_log('Command: ' . $command, 'ok');
   }
   else {
-    drush_log('This generally takes about ' . $durations[md5($command)]['time'] . ' seconds', 'ok');
-  }
-  $start = time();
-  exec($command, $output);
-  $durations[md5($command)]['time'] = time() - $start;
-  $durations[md5($command)]['count']++;
-  variable_set('dcycle_command_durations', $durations);
-  
-  foreach ($output as $line) {
-    drush_log($line, 'ok');
+    $output = array();
+    $durations = variable_get('dcycle_command_durations', array());
+    drush_log('About to call ' . $command, 'ok');
+    if (!isset($durations[md5($command)]['time'])) {
+      drush_log('Not sure how long this will take.');
+      $durations[md5($command)] = array(
+        'time' => 0,
+        'count' => 0,
+      );
+    }
+    else {
+      drush_log('This generally takes about ' . $durations[md5($command)]['time'] . ' seconds', 'ok');
+    }
+    $start = time();
+    exec($command, $output);
+    $durations[md5($command)]['time'] = time() - $start;
+    $durations[md5($command)]['count']++;
+    variable_set('dcycle_command_durations', $durations);
+    
+    foreach ($output as $line) {
+      drush_log($line, 'ok');
+    }
   }
 }
 

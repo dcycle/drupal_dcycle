@@ -213,10 +213,15 @@ abstract class dcycleBasePolicy {
    *
    * To call this set up your environment in the GUI and then
    * call drush dcycle-test in the command line.
+   *
+   * @param $drushObject
+   *   An object as defined in dcycle.drush.inc, which you can
+   *   call to get drush environment information such as
+   *   simulate.
    */
-  function testAll() {
+  function testAll($drushObject) {
     foreach ($this->getRules() as $rule) {
-      $rule->test();
+      $rule->test($drushObject);
     }
   }
 }
