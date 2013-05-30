@@ -19,6 +19,13 @@ function dcycle_drush_command() {
       'module' => 'A Drupal module.',
     ),
   );
+  $items['dcycle-mock'] = array(
+    'description' => dt('dcycle-mock mock starts using mock object; dcycle-mock real stops using mock objects.'),
+    'bootstrap' => DRUSH_BOOTSTRAP_DRUSH,
+    'arguments' => array(
+      'mock-type' => 'Mock type should be real or mock.',
+    ),
+  );
   return $items;
 }
 
@@ -34,12 +41,21 @@ function dcycle_drush_help($section) {
 }
 
 /**
+ * Run 'dcycle-mock'.
+ *
+ * Toggles using mock objects. Usage is "dcycle-mock mock" or "dcycle-mock 
+ * real".
+ */
+function drush_dcycle_mock() {
+  dcycle_mockable_set_type($args[1]);
+}
+
+/**
  * Run 'dcycle-test'.
  *
  * For each test which passes the preflight, run the test.
  */
 function drush_dcycle_test() {
-  $args = drush_parse_args();
   $module = $args[1];
 
   // start by preflighting simpletest

@@ -5,13 +5,34 @@
  * Defines the dcycle policy
  */
 
+// load the parent class
 module_load_include('inc', 'dcycle', 'includes/dcycle_policies/base/dcycleBasePolicy');
 
+/**
+ * The dcycle Quickstart policy.
+ *
+ * This policy is meant to used when doing demos, tutorials, etc.
+ * It is meant to be a general-purpose robust policy.
+ */
 class dcycleQuickstartPolicy extends dcycleBasePolicy {
+  /**
+   * An info associative array with various policy settings.
+   */
   private $info;
+
+  /**
+   * Constructor, setting the info array
+   *
+   * @param $info
+   *   An associative array with whatever information you want.
+   */
   function __construct($info = array()) {
     $this->info = $info;
   }
+
+  /**
+   * Overrides _getRules().
+   */
   function _getRules() {
     return array(
       $this->getRuleObject('dcycle', 'dcycleEnvironmentRule'),
@@ -23,12 +44,30 @@ class dcycleQuickstartPolicy extends dcycleBasePolicy {
       $this->getRuleObject('dcycle', 'dcycleModuleDevRule'),
     );
   }
+
+  /**
+   * Gets the version of this policy.
+   *
+   * @TODO think more about what to do when there are more than one versions
+   * of a given policy.
+   */
   function getVersion() {
     return 'dev';
   }
+
+  /**
+   * Gets the human name of the policy.
+   */
   function getName() {
     return 'dcycle';
   }
+
+  /**
+   * Dcycle defines the concept of an environment type: dev or prod
+   *
+   * @TODO is this really needed? Devops states there should not really
+   * be a distinction between environments.
+   */
   function getEnvironmentType() {
     if (isset($this->info['environment'])) {
       $return = $this->info['environment'];
@@ -39,6 +78,11 @@ class dcycleQuickstartPolicy extends dcycleBasePolicy {
     return $return;
   }
 
+  /**
+   * Are we developing a website or a module?
+   *
+   * @TODO This should be in the rule, not the policy.
+   */
   function getProjectType() {
     return variable_get('dcycle_project_type', $this->discoverProjectType());
   }
@@ -64,6 +108,9 @@ class dcycleQuickstartPolicy extends dcycleBasePolicy {
     }
   }
 
+  /**
+   * Overrides _getAttribute().
+   */
   function _getAttribute($name) {
     switch ($name) {
       case 'environment':
@@ -80,6 +127,10 @@ class dcycleQuickstartPolicy extends dcycleBasePolicy {
         break;
     }
   }
+
+  /**
+   * Overrides dcycleBasePolicy::renderedSettings().
+   */
   function renderedSettings() {
     $form['dcycle_environment_type'] = array(
       '#type' => 'select',
@@ -103,6 +154,10 @@ class dcycleQuickstartPolicy extends dcycleBasePolicy {
     );
     return $form;
   }
+
+  /**
+   * Overrides dcycleBasePolicy::policyFromForm().
+   */
   function policyFromForm($form) {
     if (isset($form['dcycle_environment_type']['#value'])) {
       return new dcyclePolicy(array('environment' => $form['dcycle_environment_type']['#value']));

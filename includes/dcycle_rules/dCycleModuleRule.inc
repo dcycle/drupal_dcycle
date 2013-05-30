@@ -2,16 +2,35 @@
 
 /**
  * @file
+ * Abstract base class for module requirements
  */
 
+/**
+ * Abstract base class for module requirements
+ */
 abstract class dcycleModuleRule extends dcycleBaseRule {
+  /**
+   * Overrides getName().
+   */
   function getName() {
     return format_plural(count($this->getModules()), 'The @m module is required to be @required. Reason: @r', 'The modules @m are required to be @required. Reason: @r', array('@m' => implode(', ', $this->getModules()), '@required' => implode('; ', $this->getReqInfo()), '@r' => $this->getDescription()));
   }
+
+  /**
+   * Retrieve modules.
+   */
   function getModules() {
     return $this->_getModules();
   }
+
+  /**
+   * Abstract function to return modules which must be present or absent.
+   */
   abstract function _getModules();
+
+  /**
+   * Returns strings defining requirement info.
+   */
   function getReqInfo() {
     $return = array();
     foreach (array('on' => $this->getEnvironmentsOn(), 'off' => $this->getEnvironmentsOff()) as $status => $environments) {
@@ -21,13 +40,29 @@ abstract class dcycleModuleRule extends dcycleBaseRule {
     }
     return $return;
   }
+
+  /**
+   * In which environments should these modules be on?
+   */
   function getEnvironmentsOn() {
     return array();
   }
+
+  /**
+   * In which environments should these modules be off?
+   */
   function getEnvironmentsOff() {
     return array();
   }
+
+  /**
+   * Abstract function, returns why the module is required or not.
+   */
   abstract function getDescription();
+
+  /**
+   * Overrides _requirements().
+   */
   function _requirements() {
     $requirements = array();
     foreach ($this->getModules() as $module) {
@@ -71,6 +106,9 @@ abstract class dcycleModuleRule extends dcycleBaseRule {
     $this->getPolicyAttribute('environment', array('equals' => array('dev', 'prod')));
   }
 
+  /**
+   * Returns a human string about if the module exist or not.
+   */
   function moduleExistsHuman($module) {
     $exists = module_exists($module);
     return $exists?t('Module exists'):t('Module does not exist or is enabled');

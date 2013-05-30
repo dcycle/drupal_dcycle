@@ -2,11 +2,19 @@
 
 /**
  * @file
+ * deployment module must exist
  */
 
+// load the parent class
 module_load_include('inc', 'dcycle', 'includes/dcycle_rules/dcycleBaseRule');
 
+/**
+ * deployment module must exist rule class
+ */
 class dcycleDeploymentModuleRule extends dcycleBaseRule {
+  /**
+   * Overrides getName().
+   */
   function getName() {
     return 'A deployment module must exist and define the website\'s namespace, in the form sites/*/modules/custom/[namespace]_deploy.';
   }
@@ -20,10 +28,16 @@ class dcycleDeploymentModuleRule extends dcycleBaseRule {
     return in_array($this->getPolicyAttribute('project_type', array('equals' => array('website', 'module'))), array('website'));
   }
 
+  /**
+   * Tries to find a deployment module.
+   */
   function deploymentModule() {
     return dcycle_deployment_module();
   }
 
+  /**
+   * Overrides _requirements().
+   */
   function _requirements() {
     $deployment_module = dcycle_deployment_module();
     $requirements['deployment_module'] = array(
@@ -41,4 +55,5 @@ class dcycleDeploymentModuleRule extends dcycleBaseRule {
     );
     return $requirements;
   }
+
 }

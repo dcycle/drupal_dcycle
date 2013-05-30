@@ -2,10 +2,15 @@
 
 /**
  * @file
+ * Rule for module under development.
  */
 
+// load the parent clas
 module_load_include('inc', 'dcycle', 'includes/dcycle_rules/dcycleBaseRule');
 
+/**
+ * Rule class for rule for module under development.
+ */
 class dcycleModuleDevRule extends dcycleBaseRule {
   /**
    * Overrides dcycleBaseRule::getName().
@@ -23,6 +28,11 @@ class dcycleModuleDevRule extends dcycleBaseRule {
     return in_array($this->getPolicyAttribute('project_type', array('equals' => array('website', 'module'))), array('module'));
   }
 
+  /**
+   * Gets all modules under git.
+   *
+   * This will allow us to surmise which module we are developing.
+   */
   function modulesUnderGit() {
     $modules_under_git = array();
 
@@ -59,4 +69,5 @@ class dcycleModuleDevRule extends dcycleBaseRule {
 
     return $requirements;
   }
+
 }

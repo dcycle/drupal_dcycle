@@ -6,10 +6,18 @@
  */
 
 abstract class dcycleBaseRule {
+  /**
+   * Parent policy.
+   */
   private $policy;
+
+  /**
+   * Creates the rule with its parent policy.
+   */
   function __construct($policy) {
     $this->policy = $policy;
   }
+
   /**
    * Get requirements only if relevant in the policy
    *
@@ -55,18 +63,38 @@ abstract class dcycleBaseRule {
       $return[$this->getMachineName() . '_' . $name] = $info;
     }
     return $return;
-  }   
+  }
+
+  /**
+   * Get the name of a policy.
+   */
   abstract function getName();
+
+  /**
+   * Get the machine name of the policy.
+   */
   function getMachineName() {
     return get_class();
   }
+
+  /**
+   * Return the requirements for this policy.
+   */
   abstract function _requirements();
+
+  /**
+   * Return the parent policy for this rule.
+   */
   function getPolicy() {
     // The policy here is not necessarily the site's policy. It might
     // be the site's policy with some overridden info, or another policy
     // altogether, for preview purposes.
     return $this->policy;
   }
+
+  /**
+   * Get policy attribute from the parent policy, check for $expected.
+   */
   function getPolicyAttribute($name, $expected) {
     $policy = $this->getPolicy();
     return $policy->getAttribute($name, $expected);

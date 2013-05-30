@@ -2,10 +2,16 @@
 
 /**
  * @file
+ * Mock objects must be properly used.
  */
 
+// load parent
 module_load_include('inc', 'dcycle', 'includes/dcycle_rules/dcycleBaseRule');
 
+/**
+ * @file
+ * Rule class to ensure that mock objects must be properly used.
+ */
 class dcycleMockRule extends dcycleBaseRule {
   /**
    * Overrides dcycleBaseRule::getName().
@@ -27,4 +33,5 @@ class dcycleMockRule extends dcycleBaseRule {
       ),
     );
   }
+
 }

@@ -2,10 +2,15 @@
 
 /**
  * @file
+ * Git folder must exist.
  */
 
+// load base class
 module_load_include('inc', 'dcycle', 'includes/dcycle_rules/dcycleBaseRule');
 
+/**
+ * Class for rule stating that git folder must exist.
+ */
 class dcycleGitRule extends dcycleBaseRule {
   /**
    * Overrides dcycleBaseRule::getName().
@@ -52,11 +57,16 @@ class dcycleGitRule extends dcycleBaseRule {
     return $requirements;
   }
 
-
+  /**
+   * Find the attribute in the parent policy.
+   */
   function getProject() {
     return $this->getPolicyAttribute('active-project', array('not-empty');
   }
 
+  /**
+   * Check if the project is a git project.
+   */
   function isGit() {
     if (function_exists('exec')) {
       $output = array();
@@ -73,4 +83,5 @@ class dcycleGitRule extends dcycleBaseRule {
       throw new Exception('Please enable PHP\'s exec() must be available on your dev machine');
     }
   }
+
 }

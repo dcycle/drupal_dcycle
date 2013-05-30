@@ -15,6 +15,9 @@
  * branch.
  */
 abstract class dcycleBasePolicy {
+  /**
+   * Returns non-themed requirements for this policy.
+   */
   function requirements() {
     include_once DRUPAL_ROOT . '/includes/install.inc';
     $requirements = array();
@@ -36,6 +39,10 @@ abstract class dcycleBasePolicy {
     }
     return $requirements;
   }
+
+  /**
+   * Returns a hyperlink that explains this policy.
+   */
   function getLink() {
     $url = $this->getUrl();
     $name = $this->getName();
@@ -46,13 +53,31 @@ abstract class dcycleBasePolicy {
       return $name;
     }
   }
+
+  /**
+   * Get the name of this policy.
+   */
   abstract function getName();
+
+  /**
+   * Get the version of the policy.
+   */
   abstract function getVersion();
+
+  /**
+   * Get the URL of this policy, or NULL if there is none.
+   */
   function getUrl() {
     // Subclasses may override this if they have a public URL describing
     // their policy
     return NULL;
   }
+
+  /**
+   * Get a list of rules for this policy. Includes checking
+   *
+   * @throws Exception
+   */
   function getRules() {
     $return = $this->_getRules();
     foreach ($return as $object) {
@@ -62,11 +87,23 @@ abstract class dcycleBasePolicy {
     }
     return $return;
   }
+
+  /**
+   * Get a list of rules for this policy. Abstract, overridable by subclasses.
+   */
   abstract function _getRules();
+
+  /**
+   * Given a module and a class, return a corresponding rule object.
+   */
   function getRuleObject($module, $name) {
     module_load_include('inc', $module, 'includes/dcycle_rules/' . $name);
     return new $name($this);
   }
+
+  /**
+   * Subclasses can defined attributes, this is the public interface for them.
+   */
   function getAttribute($name, $expected) {
     $return = $this->_getAttribute($name);
     if (isset($expected['equals'])) {
@@ -76,6 +113,10 @@ abstract class dcycleBasePolicy {
     }
     return $return;
   }
+
+  /**
+   * Return an attribute
+   */
   function _getAttribute($name) {
     // by default return NULL; subclasses can override this.
     return NULL;
@@ -99,6 +140,9 @@ abstract class dcycleBasePolicy {
     return theme('status_report', array('requirements' => $requirements));
   }
 
+  /**
+   * Get requirements for a given policy.
+   */
   static function _requirements($policy) {
     $requirements = array();
     $policy_exists = dcycle_policy_exists($policy);
@@ -134,14 +178,25 @@ abstract class dcycleBasePolicy {
     return $settings;
   }
 
+  /**
+   * Returns themed requirements.
+   */
   function renderedRequirements() {
     include_once DRUPAL_ROOT . '/includes/install.inc';
     $requirements = $this->requirements();
     return theme('status_report', array('requirements' => $requirements));
   }
+
+  /**
+   * Returns rendered settings. Subclasses can override.
+   */
   function renderedSettings() {
     return array();
   }
+
+  /**
+   * Return a policy object based on the result of a UI form.
+   */
   function policyFromForm($form) {
     // subclasses can override
     $class = $form['dcycle_policy']['#value'];
