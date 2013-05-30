@@ -5,6 +5,9 @@
  * Defines the dcycle policy
  */
 
+/**
+ * Base class for all rules.
+ */
 abstract class dcycleBaseRule {
   /**
    * Parent policy.
