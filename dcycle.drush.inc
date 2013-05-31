@@ -91,7 +91,13 @@ function drush_dcycle_test() {
   dcycle_policy_object()->testAll(new drushObject);
 }
 
+/**
+ * Object representing drush
+ */
 class drushObject {
+  /**
+   * Return TRUE if simulation module (--simulate called on command line)
+   */
   function simulate() {
     return drush_get_context('DRUSH_SIMULATE');
   }

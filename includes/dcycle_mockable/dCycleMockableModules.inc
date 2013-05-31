@@ -70,7 +70,7 @@ class dcycleMockModules extends dcycleMockableModules {
    * @param $module
    *   A module in the format array('machine' => 'human')
    */
-  public function addModule($module) {
+  public static function addModule($module) {
     self::$modules = array_merge(self::$modules, $module);
   }
 
