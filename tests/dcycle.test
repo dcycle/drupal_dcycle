@@ -65,8 +65,11 @@ class dcycleTestCase extends dcycleTestBase {
     $this->assertNoText('Your deployment module is');
     $this->assertText('Please create and enable a deployment module');
     dcycle_mockable_set('dcycle', 'dcycleMockableModules', 'dcycleMockModules', 'addModule', array(
-      'machine' => 'human',
-    ));
+        'whatever_deploy' => array(
+          'path' => 'sites/default/modules/custom/whatever_deploy',
+        ),
+      )
+    );
     $this->drupalGet('admin/config/development/dcycle');
     $this->assertText('Your deployment module is');
     $this->assertNoText('Please create and enable a deployment module');

@@ -42,7 +42,7 @@ abstract class dcycleMockableBase {
   /**
    * Set the type, normally either real or mock
    */
-  static function setType($type) {
+  static function setType($type, $more = array()) {
     self::$type = $type;
   }
 }

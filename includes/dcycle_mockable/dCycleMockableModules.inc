@@ -30,6 +30,18 @@ abstract class dcycleMockableModules extends dcycleMockableBase {
   abstract public function modules();
 
   /**
+   * Returns the list of active modules
+   *
+   * @param $options
+   *   An associative array in the format:
+   *   array(
+   *     'type' => 'module'|'theme',
+   *     'name' => 'machine name',
+   *   )
+   */
+  abstract public function drupal_get_path($options);
+
+  /**
    * Based on the type (real or mock) return the class to use.
    *
    * @return
@@ -71,7 +83,26 @@ class dcycleMockModules extends dcycleMockableModules {
    *   A module in the format array('machine' => 'human')
    */
   public static function addModule($module) {
+    if (!is_array(self::$modules)) {
+      self::$modules = array();
+    }
     self::$modules = array_merge(self::$modules, $module);
+  }
+
+  /**
+   * Overrides dcycleMockableModules::drupal_get_path().
+   */
+  public function drupal_get_path($options) {
+    foreach (self::$modules as $module => $info) {
+      if ($options['name'] == $module) {
+        if (isset($info['path']) {
+          return $info['path'];
+        }
+        else {
+          return 'sites/all/modules/' . $module;
+        }
+      }
+    }
   }
 
   /**
@@ -95,5 +126,12 @@ class dcycleRealModules extends dcycleMockableModules {
    */
   public function modules() {
     return module_list();
+  }
+
+  /**
+   * Overrides dcycleMockableModules::drupal_get_path().
+   */
+  public function drupal_get_path($options) {
+    return drupal_get_path($options['type'], $options['name']);
   }
 }

@@ -152,8 +152,12 @@ function dcycle_deployment_module() {
   // find all candidate modules which adhere to
   // sites/*/modules/custom/*_deploy
   foreach ($modules as $module) {
-    if (drupal_substr($module, drupal_strlen($module) - drupal_strlen('_deploy')) == '_deploy' && drupal_substr(drupal_get_path('module', $module), drupal_strlen(drupal_get_path('module', $module)) - drupal_strlen('/custom/' . $module)) == '/custom/' . $module) {
-      $candidates[] = $module;
+    // figure out the module's path
+    $path = dcycle_mockable('drupal_get_path', array('type' => 'module', 'name' => $module));
+    if (drupal_substr($module, drupal_strlen($module) - drupal_strlen('_deploy')) == '_deploy') {
+      if (drupal_strlen($path) - drupal_strlen('/custom/' . $module) == '/custom/' . $module) {
+        $candidates[] = $module;
+      }
     }
   }
   return $candidates;
@@ -439,6 +443,10 @@ function dcycle_dcycle_mockables() {
     'base_class' => 'dcycleMockableShell',
   );
   $mockables['modules'] = array(
+    'module' => 'dcycle',
+    'base_class' => 'dcycleMockableModules',
+  );
+  $mockables['drupal_get_path'] = array(
     'module' => 'dcycle',
     'base_class' => 'dcycleMockableModules',
   );
