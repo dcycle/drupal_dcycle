@@ -95,7 +95,7 @@ class dcycleMockModules extends dcycleMockableModules {
   public function drupal_get_path($options) {
     foreach (self::$modules as $module => $info) {
       if ($options['name'] == $module) {
-        if (isset($info['path']) {
+        if (isset($info['path'])) {
           return $info['path'];
         }
         else {
