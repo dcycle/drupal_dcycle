@@ -23,7 +23,7 @@ abstract class dcycleMockableBase {
       return new $class;
     }
     else {
-      throw new DcycleException(t('@base_class::getConcreteClass() is expected to return a concrete class; please see the API for dcycle_mockable() for details on how to use and extend the mock object system.', array('@base_class' => $base_class)));
+      throw new DcycleException(t('@base_class::getConcreteClass() is expected to return a concrete class, but returned "@return" which does not pass class_exists(); please see the API for dcycle_mockable() for details on how to use and extend the mock object system.', array('@base_class' => $base_class, '@return' => serialize($class))));
     }
   }
 
