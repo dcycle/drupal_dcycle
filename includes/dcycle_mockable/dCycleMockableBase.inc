@@ -33,7 +33,7 @@ abstract class dcycleMockableBase {
    * Get the type, normally either real or mock
    */
   static function getType() {
-    return variable_get('dcycle_mockable_base_type', array());
+    return variable_get('dcycle_mockable_base_type', 'real');
   }
 
   /**
