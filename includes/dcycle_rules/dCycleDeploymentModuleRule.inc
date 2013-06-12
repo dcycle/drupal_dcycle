@@ -42,7 +42,7 @@ class dcycleDeploymentModuleRule extends dcycleBaseRule {
     $deployment_module = dcycle_deployment_module();
     $requirements['deployment_module'] = array(
       'title' => t('dcycle Deployment module'),
-      'value' => $deployment_module?$deployment_module:'Please create and enable a deployment module at sites/*/modules/custom/[namespace]_deploy',
+      'value' => $deployment_module?t('Your deployment module is @module', array('@module' => $deployment_module)):'Please create and enable a deployment module at sites/*/modules/custom/[namespace]_deploy',
       'severity' => $deployment_module?REQUIREMENT_OK:REQUIREMENT_ERROR,
     );
     $namespace = dcycle_namespace();

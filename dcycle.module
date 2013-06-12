@@ -146,7 +146,6 @@ function dcycle_deployment_module() {
   // testing and developing, we can simulate the presence of absence of
   // certain modules
   $modules = dcycle_mockable('modules');
-
   // there should be only one candidate
   $candidates = array();
   // find all candidate modules which adhere to
@@ -155,16 +154,15 @@ function dcycle_deployment_module() {
     // figure out the module's path
     $path = dcycle_mockable('drupal_get_path', array('type' => 'module', 'name' => $module));
     if (drupal_substr($module, drupal_strlen($module) - drupal_strlen('_deploy')) == '_deploy') {
-      if (drupal_strlen($path) - drupal_strlen('/custom/' . $module) == '/custom/' . $module) {
+      if (drupal_substr($path, drupal_strlen($path) - drupal_strlen('/custom/' . $module) == '/custom/' . $module)) {
         $candidates[] = $module;
       }
     }
   }
-  return $candidates;
 
   switch (count($candidates)) {
     case 0:
-      // Don't throw an exception if there are none. This is not really
+      // Don't throw an exception if there are none. This is not
       // an error but a normal situation when dcycle is first installed.
       return NULL;
       break;
@@ -391,7 +389,7 @@ function dcycle_module_simpletests($module) {
  * Tested in tests/dcycle.test
  */
 function dcycle_mockable($function, $argument = NULL) {
-  // invoke hook_mockables 
+  // invoke hook_mockables
   $mockables = module_invoke_all('dcycle_mockables');
 
   if (isset($mockables[$function])) {

@@ -33,16 +33,14 @@ abstract class dcycleMockableBase {
    * Get the type, normally either real or mock
    */
   static function getType() {
-    if (!self::$type) {
-      self::$type = 'real';
-    }
-    return self::$type;
+    return variable_get('dcycle_mockable_base_type', array());
   }
 
   /**
    * Set the type, normally either real or mock
    */
   static function setType($type, $more = array()) {
-    self::$type = $type;
+    variable_set('dcycle_mockable_base_type', $type);
+    variable_set('dcycle_mockable_base_more', $more);
   }
 }

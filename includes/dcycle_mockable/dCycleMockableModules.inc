@@ -69,11 +69,6 @@ abstract class dcycleMockableModules extends dcycleMockableBase {
  */
 class dcycleMockModules extends dcycleMockableModules {
   /**
-   * List of mock active modules.
-   */
-  private static $modules;
-
-  /**
    * Add a module to the mock list of modules.
    *
    * This can be used during testing or development to see how the system
@@ -83,17 +78,16 @@ class dcycleMockModules extends dcycleMockableModules {
    *   A module in the format array('machine' => 'human')
    */
   public static function addModule($module) {
-    if (!is_array(self::$modules)) {
-      self::$modules = array();
-    }
-    self::$modules = array_merge(self::$modules, $module);
+    $modules = self::staticModules();
+    $modules = array_merge($modules, $module);
+    variable_set('dcycle_mockable_modules_list', $modules);
   }
 
   /**
    * Overrides dcycleMockableModules::drupal_get_path().
    */
   public function drupal_get_path($options) {
-    foreach (self::$modules as $module => $info) {
+    foreach (variable_get('dcycle_mockable_modules_list', array()) as $module => $info) {
       if ($options['name'] == $module) {
         if (isset($info['path'])) {
           return $info['path'];
@@ -105,15 +99,19 @@ class dcycleMockModules extends dcycleMockableModules {
     }
   }
 
+  public static function staticModules() {
+    $return = array();
+    foreach (variable_get('dcycle_mockable_modules_list', array()) as $module => $info) {
+      $return[$module] = $module;
+    }
+    return $return;
+  }
+
   /**
    * Overrides dcycleMockableModules::modules().
    */
   public function modules() {
-    $return = array();
-    if (self::$modules) {
-      $return = self::$modules;
-    }
-    return $return;
+    return self::staticModules();
   }
 }
 

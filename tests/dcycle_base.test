@@ -168,7 +168,7 @@ class dcycleTestBase extends DrupalWebTestCase {
    */
   function assertMockEquals($function, $argument, $expected) {
     $result = dcycle_mockable($function, $argument);
-    $this->assertTrue($result == $expected, t('Calling the mockable function @function with the argument @argument results in the expected @expected (it is @real) @caller', array('@function' => $function, '@argument' => serialize($argument), '@expected' => serialize($expected), '@real' => $result, '@caller' => dcycle_calling_function())));
+    $this->assertTrue($result == $expected, t('Calling the mockable function @function with the argument @argument results in the expected @expected (it is @real) @caller', array('@function' => $function, '@argument' => serialize($argument), '@expected' => serialize($expected), '@real' => serialize($result), '@caller' => dcycle_calling_function())));
   }
 
 }
