@@ -99,6 +99,9 @@ class dcycleMockModules extends dcycleMockableModules {
     }
   }
 
+  /**
+   * Returns the mock module list in a static function call.
+   */
   public static function staticModules() {
     $return = array();
     foreach (variable_get('dcycle_mockable_modules_list', array()) as $module => $info) {
