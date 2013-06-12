@@ -274,9 +274,10 @@ function dcycle_get_available_policies() {
   // It is possible that another policy was selected, and then the
   // module was disabled, in which case that policy is now selected
   // but broken. It should still be listed as available.
-  if (!dcycle_policy_exists(dcycle_policy())) {
+  $policy = dcycle_policy();
+  if (!dcycle_policy_exists($policy)) {
     $policies = array_merge($policies, array(
-      dcycle_policy_key() => '[' . t('broken') . '] ' . dcycle_policy()['class-name'],
+      dcycle_policy_key() => '[' . t('broken') . '] ' . $policy['class-name'],
     ));
   }
   return $policies;
