@@ -103,7 +103,7 @@ abstract class dcycleModuleRule extends dcycleBaseRule {
    * Returns the current environment as returned by the policy
    */
   function currentEnvironment() {
-    $this->getPolicyAttribute('environment', array('equals' => array('dev', 'prod')));
+    return $this->getPolicyAttribute('environment', array('equals' => array('dev', 'prod')));
   }
 
   /**
@@ -111,6 +111,6 @@ abstract class dcycleModuleRule extends dcycleBaseRule {
    */
   function moduleExistsHuman($module) {
     $exists = module_exists($module);
-    return $exists?t('Module exists'):t('Module does not exist or is enabled');
+    return $exists?t('Module exists'):t('Module does not exist or is disabled');
   }
 }
