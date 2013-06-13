@@ -173,6 +173,13 @@ class dcycleQuickstartPolicy extends dcycleBasePolicy {
    * - 
    */
   function getTargetModule() {
+    $conf = variable_get('dcycle', array()) {
+      if (isset($conf['modules']) && is_array($conf['modules']) && count($conf['modules'])) {
+        foreach ($conf['modules'] as $machine => $info) {
+          return $machine;
+        }
+      }
+    }
     $moduleDevRule = $this->getRuleObject('dcycle', 'dcycleModuleDevRule');
     if ($moduleDevRule->checkReqs()) {
       // we know there is only one because that is the requirement that
