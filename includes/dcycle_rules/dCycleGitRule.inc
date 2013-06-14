@@ -25,7 +25,7 @@ class dcycleGitRule extends dcycleBaseRule {
    * Use this rule only for the dev environment.
    */
   function usedForPolicy() {
-    $environment = in_array($this->getPolicyAttribute('environment', array('equals' => array('dev', 'prod'))), array('dev'));
+    return in_array($this->getPolicyAttribute('environment', array('equals' => array('dev', 'prod'))), array('dev'));
   }
 
   /**
@@ -39,9 +39,9 @@ class dcycleGitRule extends dcycleBaseRule {
       // will be in git. It is not necessary here to know which ones
       $is_git = $this->isGit();
       $requirements['git_exists'] = array(
-        'title' => t('Environment'),
-        'value' => $environment?$environment:'Not yet set, please set it',
-        'severity' => $environment?REQUIREMENT_INFO:REQUIREMENT_ERROR,
+        'title' => t('Git status'),
+        'value' => $is_git?'OK':'Not yet set, please set it',
+        'severity' => $is_git?REQUIREMENT_OK:REQUIREMENT_ERROR,
         'weight' => -1,
       );
     }
@@ -61,7 +61,7 @@ class dcycleGitRule extends dcycleBaseRule {
    * Find the attribute in the parent policy.
    */
   function getProject() {
-    return $this->getPolicyAttribute('active-project', array('not-empty');
+    return $this->getPolicyAttribute('active-project', array('not-empty'));
   }
 
   /**
@@ -71,7 +71,7 @@ class dcycleGitRule extends dcycleBaseRule {
     if (function_exists('exec')) {
       $output = array();
       $project = $this->getProject();
-      dcycle_exec('cd ' . getcwd() . '/' . drupal_get_path($project['type'], $project['name']) '; git status', $output);
+      exec('cd ' . getcwd() . '/' . drupal_get_path($project['type'], $project['name']) . '; git status', $output);
       foreach ($output as $line) {
         if ($line == 'fatal: Not a git repository (or any of the parent directories): .git') {
           return FALSE;

@@ -41,6 +41,7 @@ class dcycleQuickstartPolicy extends dcycleBasePolicy {
       $this->getRuleObject('dcycle', 'dcycleDeploymentModuleRule'),
       $this->getRuleObject('dcycle', 'dcycleCoderReviewRule'),
       $this->getRuleObject('dcycle', 'dcycleModuleDevRule'),
+      $this->getRuleObject('dcycle', 'dcycleGitRule'),
     );
   }
 
