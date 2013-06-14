@@ -6,4 +6,4 @@ files[] = tests/dcycle.test
 files[] = tests/dcycle_base_self.test
 dcycle_policy = tests/policy.dcycle
 ;following information inserted by the dcycle jenkins CI server
-continuous-integration-version = "2013-06-13-14:41:05 (commit 7e11d04)"
+continuous-integration-version = "2013-06-14-15:31:26 (commit ea63685)"
