@@ -28,6 +28,9 @@ class dcycleGitRule extends dcycleBaseRule {
     return in_array($this->siteType(), array('dev'));
   }
   
+  /**
+   * Returns whether we are in dev or prod.
+   */
   function siteType() {
     return $this->getPolicyAttribute('environment', array('equals' => array('dev', 'prod')));
   }
@@ -61,10 +64,16 @@ class dcycleGitRule extends dcycleBaseRule {
     return $requirements;
   }
 
+  /**
+   * Returns whether we developing a module or website.
+   */
   function devType() {
     return $this->getPolicyAttribute('project_type', array('equals' => array('website', 'module')));
   }
 
+  /**
+   * Returns the human-readable title for the requirement.
+   */
   function reqTitle() {
     switch ($this->devType()) {
       case 'module':
@@ -86,6 +95,9 @@ class dcycleGitRule extends dcycleBaseRule {
     return $this->getPolicyAttribute('active-project', array('not-empty'));
   }
 
+  /**
+   * Return the human-readable output of whether this is a git repo or not.
+   */
   function isGitHuman() {
     $info = array();
     $is_git = $this->isGit($info);
@@ -107,6 +119,7 @@ class dcycleGitRule extends dcycleBaseRule {
    */
   function isGit(&$info = array()) {
     if (function_exists('exec')) {
+      $project = $this->getProject();
       switch ($this->devType()) {
         case 'module':
           $dir = getcwd() . '/' . drupal_get_path($project['type'], $project['name']);
@@ -120,7 +133,6 @@ class dcycleGitRule extends dcycleBaseRule {
       }
       $return_var = NULL;
       $output = array();
-      $project = $this->getProject();
       exec('cd ' . $dir . '; git status', $output, $return_var);
       if ($return_var) {
         $info['desc'] = t('@dir does not seem to be a git directory (or any of its parents).', array('@dir' => $dir));

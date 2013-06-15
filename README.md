@@ -148,6 +148,12 @@ Step 7: link your project to a remote repo
 * Link your local git repo to the remote and push your master branch there
     git remote add origin git@github.com:mygithubhandle/mygitproject.git
     git push origin master
+* Make sure a stage branch exists (this will be your stable branch)
+    git checkout -b stage
+    git merge master
+    git push origin stage
+    git checkout master
+    
 
 Step 8: link your project to a continuous integration server. For this example we'll put Jenkins directly on our local computer
 
