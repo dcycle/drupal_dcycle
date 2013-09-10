@@ -388,7 +388,13 @@ function dcycle_module_simpletests($module) {
  *
  * Tested in tests/dcycle.test
  */
-function dcycle_mockable($function, $argument = NULL) {
+function dcycle_mockable($function) {
+  if (module_exists('mockable')) {
+  }
+  else {
+    return call_user_func_array($call, array_splice($args, 1));
+  }
+
   // invoke hook_mockables
   $mockables = module_invoke_all('dcycle_mockables');
 
