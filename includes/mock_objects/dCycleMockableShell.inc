@@ -6,7 +6,7 @@
  */
 
 // Include parent class file.
-dcycle_load_include('inc', 'dcycle', 'includes/dcycle_mockable/dcycleMockableBase');
+dcycle_load_include('inc', 'Dcycle', 'includes/dcycle_mockable/dcycleMockableBase');
 
 /**
  * Abstract class for dealing with the shell

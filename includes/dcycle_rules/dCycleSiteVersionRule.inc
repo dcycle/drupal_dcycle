@@ -6,7 +6,7 @@
  */
 
 // load base class
-module_load_include('inc', 'dcycle', 'includes/dcycle_rules/dcycleBaseRule');
+module_load_include('inc', 'Dcycle', 'includes/dcycle_rules/dcycleBaseRule');
 
 /**
  * Rule object for rule stating that there should be a site version

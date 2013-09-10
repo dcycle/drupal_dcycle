@@ -2,14 +2,14 @@
 
 /**
  * @file
- * Defines the dcycle policy
+ * Defines the Dcycle policy
  */
 
 // load the parent class
-module_load_include('inc', 'dcycle', 'includes/dcycle_policies/base/dcycleBasePolicy');
+module_load_include('inc', 'Dcycle', 'includes/dcycle_policies/base/dcycleBasePolicy');
 
 /**
- * The dcycle Quickstart policy.
+ * The Dcycle Quickstart policy.
  *
  * This policy is meant to used when doing demos, tutorials, etc.
  * It is meant to be a general-purpose robust policy.
@@ -35,13 +35,13 @@ class dcycleQuickstartPolicy extends dcycleBasePolicy {
    */
   function _getRules() {
     return array(
-      $this->getRuleObject('dcycle', 'dcycleEnvironmentRule'),
-      $this->getRuleObject('dcycle', 'dcycleSimpletestRule'),
-      $this->getRuleObject('dcycle', 'dcycleSiteVersionRule'),
-      $this->getRuleObject('dcycle', 'dcycleDeploymentModuleRule'),
-      $this->getRuleObject('dcycle', 'dcycleCoderReviewRule'),
-      $this->getRuleObject('dcycle', 'dcycleModuleDevRule'),
-      $this->getRuleObject('dcycle', 'dcycleGitRule'),
+      $this->getRuleObject('Dcycle', 'dcycleEnvironmentRule'),
+      $this->getRuleObject('Dcycle', 'dcycleSimpletestRule'),
+      $this->getRuleObject('Dcycle', 'dcycleSiteVersionRule'),
+      $this->getRuleObject('Dcycle', 'dcycleDeploymentModuleRule'),
+      $this->getRuleObject('Dcycle', 'dcycleCoderReviewRule'),
+      $this->getRuleObject('Dcycle', 'dcycleModuleDevRule'),
+      $this->getRuleObject('Dcycle', 'dcycleGitRule'),
     );
   }
 
@@ -59,7 +59,7 @@ class dcycleQuickstartPolicy extends dcycleBasePolicy {
    * Gets the human name of the policy.
    */
   function getName() {
-    return 'dcycle';
+    return 'Dcycle';
   }
 
   /**
@@ -100,7 +100,7 @@ class dcycleQuickstartPolicy extends dcycleBasePolicy {
    *   A project type, 'website' or 'module'
    */
   function discoverProjectType() {
-    if ($this->getRuleObject('dcycle', 'dcycleModuleDevRule')->checkReqs()) {
+    if ($this->getRuleObject('Dcycle', 'dcycleModuleDevRule')->checkReqs()) {
       return 'module';
     }
     else {
@@ -174,13 +174,13 @@ class dcycleQuickstartPolicy extends dcycleBasePolicy {
    * - 
    */
   function getTargetModule() {
-    $conf = variable_get('dcycle', array());
+    $conf = variable_get('Dcycle', array());
     if (isset($conf['modules']) && is_array($conf['modules']) && count($conf['modules'])) {
       foreach ($conf['modules'] as $machine => $info) {
         return $machine;
       }
     }
-    $moduleDevRule = $this->getRuleObject('dcycle', 'dcycleModuleDevRule');
+    $moduleDevRule = $this->getRuleObject('Dcycle', 'dcycleModuleDevRule');
     if ($moduleDevRule->checkReqs()) {
       // we know there is only one because that is the requirement that
       // was just checked
@@ -190,7 +190,7 @@ class dcycleQuickstartPolicy extends dcycleBasePolicy {
       }
     }
     else {
-      return $this->getRuleObject('dcycle', 'dcycleDeploymentModuleRule')->deploymentModule();
+      return $this->getRuleObject('Dcycle', 'dcycleDeploymentModuleRule')->deploymentModule();
     }
   }
   

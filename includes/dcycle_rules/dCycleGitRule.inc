@@ -6,7 +6,7 @@
  */
 
 // load base class
-module_load_include('inc', 'dcycle', 'includes/dcycle_rules/dcycleBaseRule');
+module_load_include('inc', 'Dcycle', 'includes/dcycle_rules/dcycleBaseRule');
 
 /**
  * Class for rule stating that git folder must exist.

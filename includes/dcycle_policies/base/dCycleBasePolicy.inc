@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Defines the dcycle policy
+ * Defines the Dcycle policy
  */
 
 /**
@@ -22,7 +22,7 @@ abstract class dcycleBasePolicy {
     include_once DRUPAL_ROOT . '/includes/install.inc';
     $requirements = array();
     $requirements['dcycle_version'] = array(
-      'title' => t('!d version', array('!d' => l(t('dcycle'), 'http://dcycleproject.org/'))),
+      'title' => t('!d version', array('!d' => l(t('Dcycle'), 'http://dcycleproject.org/'))),
       'value' => dcycle_version(),
       'severity' => REQUIREMENT_INFO,
       'weight' => -2,
@@ -215,7 +215,7 @@ abstract class dcycleBasePolicy {
    * call drush dcycle-test in the command line.
    *
    * @param $drushObject
-   *   An object as defined in dcycle.drush.inc, which you can
+   *   An object as defined in Dcycle.drush.inc, which you can
    *   call to get drush environment information such as
    *   simulate.
    */

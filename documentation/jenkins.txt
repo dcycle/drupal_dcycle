@@ -2,12 +2,12 @@ Jenkins for continuous integration (CI)
 
 - Make sure coder module is installed on your site if you want to test for coding standards, and apply the patch at http://drupal.org/node/1974654 (unless it is integrated into your version of coder), or else you will get false negatives.
 
-- Make sure your project follows dcycle guidelines and is available on a git
+- Make sure your project follows Dcycle guidelines and is available on a git
   repo.
 - Install Jenkins (for example at http://localhost:8080/)
 - Go to http://localhost:8080/pluginManager/available and make sure
   the Git Plugin, post build task and Jenkins Text Finder are available
-- Configure a new project (for example dcycle)
+- Configure a new project (for example Dcycle)
 - In the command line type (with your credentials):
 echo 'create database jenkins_[project_name]' | mysql -uroot -proot
 - Configure your Jenkins project: http://localhost:8080/job/[jobname]/configure:
@@ -51,20 +51,20 @@ drush dcycle-test
   - Console output (build log) parsing:
    - mark build unstable on warning
    - mark build unstable on error
-   - select parsing rules dcycle (this is a file
+   - select parsing rules Dcycle (this is a file
   - (optional) Jenkins text finder regular expression "[^0][1-9]*.(fails|exceptions|could not be found|normal warnings|minor warnings|ERROR)" and "search the console"
   - Git publisher: publish if succeeds, push to branch master (or whatever your CI branch is, 7.x-1.x for example if you are developing a drupal module), Target remote name: "main" (which you selected previously -- if you haven't yet saved, it will tell you main does not exist, save and come back to this page and the warning should disappear)
   - Console:
   
-cat sites/default/modules/custom/demo_deploy/demo_deploy.info | grep -v 'version' | grep -v ';following information inserted by the dcycle jenkins CI server' > sites/default/modules/custom/demo_deploy/demo_deploy.info.swp
-echo ';following information inserted by the dcycle jenkins CI server' >> sites/default/modules/custom/demo_deploy/demo_deploy.info.swp 
+cat sites/default/modules/custom/demo_deploy/demo_deploy.info | grep -v 'version' | grep -v ';following information inserted by the Dcycle jenkins CI server' > sites/default/modules/custom/demo_deploy/demo_deploy.info.swp
+echo ';following information inserted by the Dcycle jenkins CI server' >> sites/default/modules/custom/demo_deploy/demo_deploy.info.swp 
 echo 'version =' $(date +%Y-%m-%d-%H:%M:%S) >> sites/default/modules/custom/demo_deploy/demo_deploy.info.swp 
 rm sites/default/modules/custom/demo_deploy/demo_deploy.info
 mv sites/default/modules/custom/demo_deploy/demo_deploy.info.swp sites/default/modules/custom/demo_deploy/demo_deploy.info
 git commit -am $(date +%Y-%m-%d-%H:%M:%S)
 
 - Go back home and "build now".
-- Troubleshoot by going to the "console output"; add an issue to dcycle for support
+- Troubleshoot by going to the "console output"; add an issue to Dcycle for support
 
 - Troubleshooting tips:
  -- Many errors are permissions errors, make sure jenkins user can do whatever it has to. (Bring a sysadmin some cookies and ask him some questions).

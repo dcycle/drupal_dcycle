@@ -6,12 +6,12 @@
  * for your own tests, please take example on tests/dcycle_base_self.test
  * for how to check for the presence of this class before declaring your
  * subclass; otherwise admin/config/development/testing will explode
- * if you enable simpletest but not dcycle. The above is tested in
+ * if you enable simpletest but not Dcycle. The above is tested in
  * tests/dcycle_base_self.test.
  */
 
 /**
- * Base test class for dcycle and other modules.
+ * Base test class for Dcycle and other modules.
  *
  * Contains several utility functions which can be useful if you
  * want to use dcycleTestBase instead of DrupalWebTestCase as a base for your

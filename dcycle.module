@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Functions used during dcycle development.
+ * Functions used during Dcycle development.
  * See http://dcycleproject.org/
  */
 
@@ -13,8 +13,8 @@ define('DCYCLE_DEFAULT_POLICY', 'dcycleQuickstartPolicy');
  */
 function dcycle_menu() {
   $items['admin/config/development/dcycle'] = array(
-    'title' => 'dcycle',
-    'description' => 'Manage development policies, mock objects, deployment, continuous integration, test-driven development, behaviour-driven development..',
+    'title' => 'Dcycle',
+    'description' => 'Manage development policies, deployment, continuous integration, test-driven development, behaviour-driven development..',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('dcycle_settings'),
     'access arguments' => array('administer site configuration'),
@@ -50,20 +50,20 @@ function dcycle_menu_identifier() {
 }
 
 /**
- * The version of dcycle
+ * The version of Dcycle
  *
- * Sites should state which version of dcycle they are using by
+ * Sites should state which version of Dcycle they are using by
  * setting the variable 'dcycle_version'. For example if you have
  * activated the php module on your site, you are not compliant with
- * later versions of dcycle and should set your 'dcycle_version'
+ * later versions of Dcycle and should set your 'dcycle_version'
  * variable accordingly.
- * The version of dcycle is not entirely correlated with the version
+ * The version of Dcycle is not entirely correlated with the version
  * of this module, but is correlated, because this module will
- * perform checks for the latest version of the dcycle standard,
+ * perform checks for the latest version of the Dcycle standard,
  * which may not apply to the version you are using but which will
  * nonetheless appear as errors on admin/reports/status.
  * Please submit a patch if you would like certain checks to be
- * performed only for certain versions of dcycle.
+ * performed only for certain versions of Dcycle.
  */
 function dcycle_version() {
   return variable_get('dcycle_version', '1.0-dev');
@@ -145,14 +145,14 @@ function dcycle_deployment_module() {
   // get all modules. We are using dcycle_mockable here so that, during
   // testing and developing, we can simulate the presence of absence of
   // certain modules
-  $modules = dcycle_mockable('modules');
+  $modules = dcycle_mockable('dcycle_module_list');
   // there should be only one candidate
   $candidates = array();
   // find all candidate modules which adhere to
   // sites/*/modules/custom/*_deploy
   foreach ($modules as $module) {
     // figure out the module's path
-    $path = dcycle_mockable('drupal_get_path', array('type' => 'module', 'name' => $module));
+    $path = dcycle_mockable('dcycle_drupal_get_path', array('type' => 'module', 'name' => $module));
     if (drupal_substr($module, drupal_strlen($module) - drupal_strlen('_deploy')) == '_deploy') {
       if (drupal_substr($path, drupal_strlen($path) - drupal_strlen('/custom/' . $module) == '/custom/' . $module)) {
         $candidates[] = $module;
@@ -163,7 +163,7 @@ function dcycle_deployment_module() {
   switch (count($candidates)) {
     case 0:
       // Don't throw an exception if there are none. This is not
-      // an error but a normal situation when dcycle is first installed.
+      // an error but a normal situation when Dcycle is first installed.
       return NULL;
       break;
     case 1:
@@ -284,7 +284,7 @@ function dcycle_get_available_policies() {
 /**
  * Implements hook_requirements().
  *
- * Requirements are the backbone of what is dcycle. For many of
+ * Requirements are the backbone of what is Dcycle. For many of
  * dcycle's requirements, checks are made here and the report
  * can be found on admin/reports/status
  *
@@ -297,7 +297,7 @@ function dcycle_requirements($phase) {
   $requirements = array();
   try {
     $policy = dcycle_policy();
-    module_load_include('inc', 'dcycle', 'includes/dcycle_policies/' . $policy['class-name'] . '/' . $policy['class-name']);
+    module_load_include('inc', 'Dcycle', 'includes/dcycle_policies/' . $policy['class-name'] . '/' . $policy['class-name']);
     $requirements = dcycleBasePolicy::_RenderedRequirements($policy);
   }
   catch (Exception $e) {
@@ -331,167 +331,15 @@ function dcycle_module_simpletests($module) {
 /**
  * Abstraction for a mockable function and its arguments.
  *
- * For example, you might want to interact with the shell from your
- * module; i.e. you want to call shell_exec('which drush') and make sure
- * drush exists on your system. Two problems arise for testing:
- *
- * (1) you can't control your system: do you have access to it? Are
- *     you on a recognized OS? Is shell_exec() disabled in your php.ini?
- * (2) how do you test for what happens when drush is, or is not enabled
- *     in the PATH?
- *
- * Enter mock objects: instead of interacting directly with shell_exec(),
- * you interact with an abstraction of shell_exec, which can be either
- * your real environment, or, for testing, a mock environment that does
- * whatever you want.
- *
- * For an example, look at how this dcycle module implements mocking
- * for shell_exec().
- *
- * To implement a mock object, follow these steps:
- *
- * (1) Determine what you want to mock, for example time(): during the
- * normal course of execution in production, you want time() to return
- * the real actual time (this is just meant as an example; in Drupal you
- * would rarely call time(), using rather the REQUEST_TIME global)
- *
- * (2) In your code, instead of calling time(), call dcycle_mockable('time').
- *
- * (3) Implement hook_dcycle_mockables(), and make sure one of the keys is
- * 'time'
- *
- * (4) The time key should include an array with the name of your module and
- * the name of the time base class which resides in a file with the same name
- * (see the description of hook_dcycle_mockables() for details).
- *
- * (5) In your mockable class file, implement the real time() implementation
- * and the mock time implementation
- *
- * (6) If your application must do something special when time() is 1 a.m.
- * exactly, you can mock this by adding functions to your mock subclass, and
- * then in the testing code, set it.
- *
- * @param $function
- *   Name of a function which exists in your mockable class.
- * @param $arguments
- *   A single optional argument to pass to that function. (If you need more
- *   than one, use an array).
- *
- * @return
- *   The result of the current implementation of your mockable object.
- *   the current implementation can be real implementation (the real-world
- *   shell_exec(), in this example, on your host environment); or a mock
- *   object. This function asks your base object to instantiate itself with
- *   a subclass and then to call the requested function on its implementation.
- *
- * @throws Exception
- *
- * Tested in tests/dcycle.test
+ * See [the Mockable module](http://drupal.org/project/mockable).
  */
 function dcycle_mockable($function) {
   if (module_exists('mockable')) {
+    return mockable($function);
   }
   else {
     return call_user_func_array($call, array_splice($args, 1));
   }
-
-  // invoke hook_mockables
-  $mockables = module_invoke_all('dcycle_mockables');
-
-  if (isset($mockables[$function])) {
-    // call the abstraction of the desired function
-    $module = $mockables[$function]['module'];
-    // the base class is also the name of the file to be included
-    $base_class = $mockables[$function]['base_class'];
-    // the real and the mock class must exist
-
-    // include the file and load an object of the class
-    dcycle_load_include('inc', $module, 'includes/dcycle_mockable/' . $base_class);
-    $object = dcycleMockableBase::getMockable($base_class);
-    // return the function's result.
-    if (method_exists($object, $function)) {
-      return $object->$function($argument);
-    }
-    else {
-      throw new DcycleException(t('Please make sure the function @class::@function exists', array('@class' => get_class($object), '@function' => $function)));
-    }
-  }
-  else {
-    dcycle_exception('dcycle_mockable() was called with a function name (@f) that does not exist in module_invoke_all(\'dcycle_mockables\'). Make sure you are using mock objects correctly, see the description of dcycle_mockable().', array('@f' => $function));
-  }
-}
-
-/**
- * Set the type of mockable object we need.
- *
- * param @type
- *   can be 'real' or 'mock'
- *
- * param @more
- *   if you need finer control over your environment, you can set
- *   the $more parameter to what you want, and then use it within
- *   your mock object.
- */
-function dcycle_mockable_set_type($type, $more = array()) {
-  module_load_include('inc', 'dcycle', 'includes/dcycle_mockable/dcycleMockableBase');
-  dcycleMockableBase::setType($type, $more);
-}
-
-/**
- * Implements hook_dcycle_mockables().
- */
-function dcycle_dcycle_mockables() {
-  $mockables = array();
-
-  $mockables['shell_exec'] = array(
-    'module' => 'dcycle',
-    'base_class' => 'dcycleMockableShell',
-  );
-  $mockables['modules'] = array(
-    'module' => 'dcycle',
-    'base_class' => 'dcycleMockableModules',
-  );
-  $mockables['drupal_get_path'] = array(
-    'module' => 'dcycle',
-    'base_class' => 'dcycleMockableModules',
-  );
-
-  return $mockables;
-}
-
-/**
- * Allow control over the mock object.
- *
- * This is generally used during testing, or can be used during
- * development as well to see how your site reacts when, for example,
- * time() is exactly 1 a.m. (see the example with time() in the comments
- * in dcycle_mockable())
- *
- * You can use this with, for exampele, dcycle_mockable_set('dcycle',
- * ''dcycleMockableShell', 'dcycleMockShell', 'setDrush', 'whatever')
- *
- * The above, used in tests/dcycle.test, calls setDrush on dcycleMockShell,
- * thereby simulating that in future calls, the system will act as though
- * the path to drush in PATH is whatever.
- *
- * This may be preferable to calling the function directly because this
- * throws an Exception if there is a problem instead of just dying; also
- * it allows you to use one line instead of two.
- *
- * @param module
- *   The module managing this mock object
- * @param class
- *   The class of the mock object.
- * @param function
- *   The function to call on the mock object.
- * @param argument
- *   The argument to pass to the function
- *
- * @throws DcycleException
- */
-function dcycle_mockable_set($module, $file, $class, $function, $argument) {
-  dcycle_load_include('inc', $module, 'includes/dcycle_mockable/' . $file);
-  $class::$function($argument);
 }
 
 /**
@@ -542,4 +390,64 @@ function dcycle_load_include($type, $module, $file) {
   if (!module_load_include($type, $module, $file)) {
     throw new DcycleException(t('@module/@file.@type failed to load', array('@module' => $module, '@file' => $file, '@type' => $type)));
   }
+}
+
+/**
+ * Mockable version of drupal_get_path().
+ *
+ * See the Mockable module for usage details.
+ */
+function dcycle_drupal_get_path($arg) {
+  return drupal_get_path($options['type'], $options['name']);
+}
+
+/**
+ * Mock version of drupal_get_path().
+ *
+ * See the Mockable module for usage details. Used for testing.
+ */
+function dcycle_drupal_get_path_mock($arg) {
+  foreach (variable_get('dcycle_mockable_modules_list', array()) as $module => $info) {
+    if ($options['name'] == $module) {
+      if (isset($info['path'])) {
+        return $info['path'];
+      }
+      else {
+        return 'sites/all/modules/' . $module;
+      }
+    }
+  }
+}
+
+/**
+ * Mockable version of module_list().
+ *
+ * See the Mockable module for usage details.
+ */
+function dcycle_module_list() {
+  return module_list();
+}
+
+/**
+ * Mock version of module_list().
+ *
+ * See the Mockable module for usage details. Used for testing.
+ */
+function dcycle_module_list_mock() {
+  $return = array();
+  foreach (variable_get('dcycle_mockable_modules_list', array()) as $module => $info) {
+    $return[$module] = $module;
+  }
+  return $return;
+}
+
+/**
+ * Add a module to the mock module list.
+ *
+ * Used for testing.
+ */
+function dcycle_module_list_mock_add($module) {
+  $modules = dcycle_module_list_mock();
+  $modules = array_merge($modules, $module);
+  variable_set('dcycle_mockable_modules_list', $modules);
 }

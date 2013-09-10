@@ -6,7 +6,7 @@
  */
 
 // load parent
-module_load_include('inc', 'dcycle', 'includes/dcycle_rules/dcycleBaseRule');
+module_load_include('inc', 'Dcycle', 'includes/dcycle_rules/dcycleBaseRule');
 
 /**
  * @file

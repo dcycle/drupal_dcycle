@@ -1,6 +1,6 @@
 Setting your site version
 
-For dcycle, your site is a piece of deployable software and as such each
+For Dcycle, your site is a piece of deployable software and as such each
 environment is in a specific version.
 
 At the beginning of your project, your site will not have a version number,

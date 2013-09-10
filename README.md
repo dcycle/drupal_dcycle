@@ -1,4 +1,4 @@
-How to use dcycle, a building code for Drupal
+How to use Dcycle, a building code for Drupal
 =============================================
 
 Intro
@@ -6,7 +6,7 @@ Intro
 
 Dcycle is meant to help you enforce best practices and get team members up and running fast(er) with automated testing and continuous integration.
 
-The idea of dcycle is that:
+The idea of Dcycle is that:
 * you develop on an unstable branch
 * a Jenkins server polls git for changes to your unstable branch
 * if drush dcycle-test yields no errors, your change is pushed to a (more) stable branch
@@ -23,7 +23,7 @@ Initial setup
 Quick start (takes about an hour)
 ---------------------------------
 
-Dcycle demo -- developing a website with dcycle
+Dcycle demo -- developing a website with Dcycle
 
 Step 1: install Drupal locally
 
@@ -31,7 +31,7 @@ Step 1: install Drupal locally
 * Download Drupal so it is available locally
     cd /Applications/MAMP/htdocs
     drush dl
-    drush dl; mv drupal-7* dcycle
+    drush dl; mv drupal-7* Dcycle
 * Create a database for your local site
     echo 'create database dcycle' | mysql -uroot -proot
 * Install Drupal
@@ -39,22 +39,22 @@ Step 1: install Drupal locally
     drush si --db-url=mysql://root:root@localhost/dcycle --account-name=root --account-pass=root -y
 * Make sure you can access your site locally, for example at http://localhost:8888/dcycle
 
-Step 2: get dcycle (note: it is not yet available with drush because we're in sandbox mode)
+Step 2: get Dcycle (note: it is not yet available with drush because we're in sandbox mode)
 
-* Download dcycle
+* Download Dcycle
     cd sites/all/modules
-    git clone --branch 7.x-1.x alberto56@git.drupal.org:sandbox/alberto56/1974172.git dcycle
-* Enable dcycle
-    drush en dcycle -y
+    git clone --branch 7.x-1.x alberto56@git.drupal.org:sandbox/alberto56/1974172.git Dcycle
+* Enable Dcycle
+    drush en Dcycle -y
 
-Step 3: Setup dcycle in the UI
+Step 3: Setup Dcycle in the UI
 
 * Log into your local site: get a onetime login link and paste it into your browser
     drush uli
-* Visit the dcycle admin page, for example at http://localhost:8888/dcycle/admin/config/development/dcycle
+* Visit the Dcycle admin page, for example at http://localhost:8888/dcycle/admin/config/development/dcycle
 * select "website" for development type
 
-Step 4: Download required modules, and make dcycle aware of your deployment module. To use dcycle, all websites need to have a deployment module located at sites/*/modules/custom/mysite_deploy, where mysite is a namespace unique to your project.
+Step 4: Download required modules, and make Dcycle aware of your deployment module. To use Dcycle, all websites need to have a deployment module located at sites/*/modules/custom/mysite_deploy, where mysite is a namespace unique to your project.
 
 * enable the required Coder module:
     drush dl coder;drush en coder_review -y;
@@ -112,8 +112,8 @@ Step 4: Download required modules, and make dcycle aware of your deployment modu
     }
 * enable your module
     drush en mysite_deploy -y
-* tell dcycle what you are testing by adding this to sites/default/settings.php
-    $conf['dcycle'] = array(
+* tell Dcycle what you are testing by adding this to sites/default/settings.php
+    $conf['Dcycle'] = array(
       'modules' => array(
         'mysite_deploy' => array(),
       ),
@@ -132,10 +132,10 @@ Step 5: launch dcycle-test on the command line
 
 Step 6: put your project in git
 
-* Make sure none of the folders in your project are git folders. For example, if you have downloaded dcycle via git, you might want to remove the .git folder, or else git will get confused and think you are using submodules. If you really want to use git submodules, omit this step:
+* Make sure none of the folders in your project are git folders. For example, if you have downloaded Dcycle via git, you might want to remove the .git folder, or else git will get confused and think you are using submodules. If you really want to use git submodules, omit this step:
     cd /Applications/MAMP/htdocs/dcycle
     mv sites/all/modules/dcycle/.git sites/all/modules/dcycle/_git
-* Make your entire website a git repo (dcycle only supports this method of version control for now):
+* Make your entire website a git repo (Dcycle only supports this method of version control for now):
     cd /Applications/MAMP/htdocs/dcycle
     git init
     git add .
@@ -171,7 +171,7 @@ Step 8: link your project to a continuous integration server. For this example w
     chmod u+w sites/default/settings.php
     echo '$conf[\'dcycle\'] = array(\'modules\' => array(\'mysite_deploy\' => array()));' >> sites/default/settings.php
     echo '$base_url = \'http://localhost:8888/dcycle_ci\';' >> sites/default/settings.php
-* In Jenkins create a new project (i.e. dcycle) of type freestyle
+* In Jenkins create a new project (i.e. Dcycle) of type freestyle
 * In source code management put your git address, and, under "advanced", name your repo "main" (you will use this in a later step).
 * The build trigger should be poll every minute (* * * * *)
 * Advanced project options: add a custom workspace which you can access via the web (e.g. on a mac with MAMP, you might use something like /Applications/MAMP/htdocs/dcycle_ci
@@ -181,11 +181,11 @@ Step 8: link your project to a continuous integration server. For this example w
     drush en coder -y
     drush en simpletest -y
     drush en mysite_deploy -y
-    drush en dcycle -y
+    drush en Dcycle -y
     drush dcycle-test
 * Add a post-build action of type Post-build task, and make sure Jenkins adds some data to your deployment module's .info file if all goes well, and check "Run script only if previous steps were successful":
-    cat sites/default/modules/custom/mysite_deploy/mysite_deploy.info | grep -v 'version' | grep -v ';following information inserted by the dcycle jenkins CI server' > sites/default/modules/custom/mysite_deploy/mysite_deploy.info.swp
-    echo ';following information inserted by the dcycle jenkins CI server' >> sites/default/modules/custom/mysite_deploy/mysite_deploy.info.swp 
+    cat sites/default/modules/custom/mysite_deploy/mysite_deploy.info | grep -v 'version' | grep -v ';following information inserted by the Dcycle jenkins CI server' > sites/default/modules/custom/mysite_deploy/mysite_deploy.info.swp
+    echo ';following information inserted by the Dcycle jenkins CI server' >> sites/default/modules/custom/mysite_deploy/mysite_deploy.info.swp 
     echo 'version =' $(date +%Y-%m-%d-%H:%M:%S) >> sites/default/modules/custom/mysite_deploy/mysite_deploy.info.swp 
     rm sites/default/modules/custom/mysite_deploy/mysite_deploy.info
     mv sites/default/modules/custom/mysite_deploy/mysite_deploy.info.swp sites/default/modules/custom/mysite_deploy/mysite_deploy.info

@@ -2,29 +2,28 @@
 
 /**
  * @file
- * Simpletests for dcycle
+ * Simpletests for Dcycle
  */
 
 /**
- * Make sure we don't explode if dcycle is not present.
+ * Make sure we don't explode if Dcycle is not present.
  */
-module_load_include('test', 'dcycle', 'tests/dcycle_base');
-if (!module_exists('dcycle')) {
-  drupal_set_message(t('Some tests are not shown because dcycle is not enabled'), 'warning', FALSE);
+module_load_include('test', 'Dcycle', 'tests/dcycle_base');
+if (!module_exists('Dcycle')) {
+  drupal_set_message(t('Some tests are not shown because Dcycle is not enabled'), 'warning', FALSE);
   return;
 }
 
 /**
- * Test that dcycle works as expected.
+ * Test that Dcycle works as expected.
  */
 class dcycleTestCase extends dcycleTestBase {
   /**
    * Overrides setUp().
    */
   public function setUp() {
-    parent::setUp('dcycle');
-    // Use our mock object for dealing with stuff like the filesystem.
-    dcycle_mockable_set_type('mock');
+    parent::setUp('dcycle', 'mockable');
+    mockable_set();
   }
 
   /**
@@ -32,21 +31,10 @@ class dcycleTestCase extends dcycleTestBase {
    */
   public static function getInfo() {
     return array(
-      'name' => 'dcycle functionality',
-      'description' => 'Test dcycle functionality.',
-      'group' => 'dcycle',
+      'name' => 'Dcycle functionality',
+      'description' => 'Test Dcycle functionality.',
+      'group' => 'Dcycle',
     );
-  }
-
-  /**
-   * Test the API.
-   *
-   * Because this function starts with test..., it is called.
-   */
-  public function testApi() {
-    $expected = $this->randomName();
-    dcycle_mockable_set('dcycle', 'dcycleMockableShell', 'dcycleMockShell', 'setDrush', $expected);
-    $this->assertMockEquals('shell_exec', 'which drush', array($expected));
   }
 
   /**
@@ -64,7 +52,7 @@ class dcycleTestCase extends dcycleTestBase {
     $this->drupalPost('admin/config/development/dcycle', $edit, 'Save configuration');
     $this->assertNoText('Your deployment module is');
     $this->assertText('Please create and enable a deployment module');
-    dcycle_mockable_set('dcycle', 'dcycleMockableModules', 'dcycleMockModules', 'addModule', array(
+    dcycle_mockable_set('Dcycle', 'dcycleMockableModules', 'dcycleMockModules', 'addModule', array(
         'whatever_deploy' => array(
           'path' => 'sites/default/modules/custom/whatever_deploy',
         ),

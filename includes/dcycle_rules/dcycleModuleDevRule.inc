@@ -6,7 +6,7 @@
  */
 
 // load the parent clas
-module_load_include('inc', 'dcycle', 'includes/dcycle_rules/dcycleBaseRule');
+module_load_include('inc', 'Dcycle', 'includes/dcycle_rules/dcycleBaseRule');
 
 /**
  * Rule class for rule for module under development.
@@ -64,7 +64,7 @@ class dcycleModuleDevRule extends dcycleBaseRule {
       'title' => t('Module under development'),
       'value' => implode(', ', $modules_under_git),
       'severity' => (count($modules_under_git) == 1)?REQUIREMENT_OK:REQUIREMENT_ERROR,
-      'description' => 'If you are developing a module with dcycle, exactly one module must have a git directory, the module you are developing',
+      'description' => 'If you are developing a module with Dcycle, exactly one module must have a git directory, the module you are developing',
     );
 
     return $requirements;

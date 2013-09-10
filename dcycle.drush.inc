@@ -2,13 +2,13 @@
 
 /**
  * @file
- * Drush integration for dcycle
+ * Drush integration for Dcycle
  */
 
 /**
  * Implements hook_drush_command().
  *
- * These are the dcycle commands available when you type "drush" on the
+ * These are the Dcycle commands available when you type "drush" on the
  * terminal.
  */
 function dcycle_drush_command() {
@@ -17,13 +17,6 @@ function dcycle_drush_command() {
     'bootstrap' => DRUSH_BOOTSTRAP_DRUSH,
     'arguments' => array(
       'module' => 'A Drupal module.',
-    ),
-  );
-  $items['dcycle-mock'] = array(
-    'description' => dt('dcycle-mock mock starts using mock object; dcycle-mock real stops using mock objects.'),
-    'bootstrap' => DRUSH_BOOTSTRAP_DRUSH,
-    'arguments' => array(
-      'mock-type' => 'Mock type should be real or mock.',
     ),
   );
   return $items;
@@ -38,16 +31,6 @@ function dcycle_drush_help($section) {
       $help = dt('Checks to see which tests can be run, then runs them.');
       return $help;
   }
-}
-
-/**
- * Run 'dcycle-mock'.
- *
- * Toggles using mock objects. Usage is "dcycle-mock mock" or "dcycle-mock 
- * real".
- */
-function drush_dcycle_mock() {
-  dcycle_mockable_set_type($args[1]);
 }
 
 /**

@@ -1,9 +1,11 @@
-name = dcycle
+name = Dcycle
 description = A building code for Drupal.
 package = Development
 core = 7.x
 files[] = tests/dcycle.test
 files[] = tests/dcycle_base_self.test
+test_dependencies[] = mockable
 dcycle_policy = tests/policy.dcycle
-;following information inserted by the dcycle jenkins CI server
+
+;following information inserted by the Dcycle jenkins CI server
 continuous-integration-version = "2013-06-15-11:01:18 (commit c9d26da)"

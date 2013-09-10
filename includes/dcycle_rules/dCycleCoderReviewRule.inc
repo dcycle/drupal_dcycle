@@ -6,7 +6,7 @@
  */
 
 // load the parent class
-module_load_include('inc', 'dcycle', 'includes/dcycle_rules/dcycleModuleRule');
+module_load_include('inc', 'Dcycle', 'includes/dcycle_rules/dcycleModuleRule');
 
 /**
  * Class for the coder review rule

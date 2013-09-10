@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Functions used during dcycle development.
+ * Functions used during Dcycle development.
  * See http://dcycleproject.org/
  */
 
@@ -33,10 +33,10 @@ function dcycle_settings() {
   );
 
   // The environment status is simply the requirements set by
-  // dcycle. These same requirements appear in the admin/reports/status
+  // Dcycle. These same requirements appear in the admin/reports/status
   // page. The prefix and suffix allow the contents of the requirements to
   // be
-  module_load_include('inc', 'dcycle', 'includes/dcycle_policies/base/dcycleBasePolicy');
+  module_load_include('inc', 'Dcycle', 'includes/dcycle_policies/base/dcycleBasePolicy');
   $form['status']['dcycle_status'] = array(
     '#type' => 'markup',
     '#markup' => dcycleBasePolicy::_renderedRequirements(dcycle_policy()),

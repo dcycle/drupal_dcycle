@@ -1,7 +1,7 @@
 # Install Jenkins error log parser
 # Put this file in /tmp/rules
 # Go to JENKINS/configure
-# And in Console Output Parsing add a rule dcycle, /tmp/rules
+# And in Console Output Parsing add a rule Dcycle, /tmp/rules
 # match line starting with 'error ', case-insensitive
 
 error /Fail/

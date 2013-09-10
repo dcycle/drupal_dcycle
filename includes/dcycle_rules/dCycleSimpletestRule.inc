@@ -6,7 +6,7 @@
  */
 
 // load parent class
-module_load_include('inc', 'dcycle', 'includes/dcycle_rules/dcycleBaseRule');
+module_load_include('inc', 'Dcycle', 'includes/dcycle_rules/dcycleBaseRule');
 
 /**
  * Rule class: Simpletest must be defined for the module under dev.

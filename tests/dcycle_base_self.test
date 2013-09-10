@@ -9,9 +9,9 @@
 // grab the base test.
 module_load_include('test', 'dcycle', 'tests/dcycle_base');
 
-// don't explode the test screen if dcycle is disabled.
+// don't explode the test screen if Dcycle is disabled.
 if (!module_exists('dcycle')) {
-  drupal_set_message(t('Some tests are not shown because dcycle is not enabled'), 'warning', FALSE);
+  drupal_set_message(t('Some tests are not shown because Dcycle is not enabled'), 'warning', FALSE);
   return;
 }
 
@@ -24,9 +24,9 @@ class dcycleTestBaseSelfTestCase extends dcycleTestBase {
    */
   public static function getInfo() {
     return array(
-      'name' => 'dcycle test base functionality',
-      'description' => 'Test dcycle test base functionality.',
-      'group' => 'dcycle',
+      'name' => 'Dcycle test base functionality',
+      'description' => 'Test Dcycle test base functionality.',
+      'group' => 'Dcycle',
     );
   }
 
@@ -69,7 +69,7 @@ class dcycleTestBaseSelfTestCase extends dcycleTestBase {
 }
 
 /**
- * Test case for making sure the test screen does not explode if dcycle absent.
+ * Test case for making sure the test screen does not explode if Dcycle absent.
  */
 class dcycleNoDcycleModuleTestCase extends dcycleTestBase {
   /**
@@ -84,14 +84,14 @@ class dcycleNoDcycleModuleTestCase extends dcycleTestBase {
    */
   public static function getInfo() {
     return array(
-      'name' => 'dcycle not present on test screen',
-      'description' => 'Make sure admin/config/development/testing does not explode but gives an error message if dcycle is not enabled.',
-      'group' => 'dcycle',
+      'name' => 'Dcycle not present on test screen',
+      'description' => 'Make sure admin/config/development/testing does not explode but gives an error message if Dcycle is not enabled.',
+      'group' => 'Dcycle',
     );
   }
 
   /**
-   * Tests that the test screen does not explode if dcycle absent.
+   * Tests that the test screen does not explode if Dcycle absent.
    *
    * Because this method starts with the lowercase test..., it will
    * be run.
@@ -99,14 +99,14 @@ class dcycleNoDcycleModuleTestCase extends dcycleTestBase {
   public function testCase() {
     $this->loginAdmin();
     $this->drupalGet('admin/config/development/testing');
-    $this->assertText('Some tests are not shown because dcycle is not enabled', 'Rather than exploding, inform user that dcycle is not present');
-    $this->assertNoText('Test dcycle test base functionality.', 'Test cannot be displayed because it requires dcycle to be active for its parent class declaration');
+    $this->assertText('Some tests are not shown because Dcycle is not enabled', 'Rather than exploding, inform user that Dcycle is not present');
+    $this->assertNoText('Test Dcycle test base functionality.', 'Test cannot be displayed because it requires Dcycle to be active for its parent class declaration');
   }
 
 }
 
 /**
- * Test case for making sure tests show up if dcycle present.
+ * Test case for making sure tests show up if Dcycle present.
  */
 class dcycleTestSubclassesTestCase extends dcycleTestBase {
   /**
@@ -121,14 +121,14 @@ class dcycleTestSubclassesTestCase extends dcycleTestBase {
    */
   public static function getInfo() {
     return array(
-      'name' => 'dcycle present on test screen',
-      'description' => 'Make sure admin/config/development/testing works normally if dcycle is enabled.',
-      'group' => 'dcycle',
+      'name' => 'Dcycle present on test screen',
+      'description' => 'Make sure admin/config/development/testing works normally if Dcycle is enabled.',
+      'group' => 'Dcycle',
     );
   }
 
   /**
-   * Makes sure our tests show up on the test screen if dcycle present.
+   * Makes sure our tests show up on the test screen if Dcycle present.
    *
    * Because this method starts with the lowercase test..., it will
    * be run.
@@ -136,8 +136,8 @@ class dcycleTestSubclassesTestCase extends dcycleTestBase {
   public function testCase() {
     $this->loginAdmin();
     $this->drupalGet('admin/config/development/testing');
-    $this->assertNoText('Some tests are not shown because dcycle is not enabled', 'dcycle now enabled, the warning should not appear');
-    $this->assertText('Test dcycle test base functionality.', 'Our test can be visible because dcycle is now enabled');
+    $this->assertNoText('Some tests are not shown because Dcycle is not enabled', 'Dcycle now enabled, the warning should not appear');
+    $this->assertText('Test Dcycle test base functionality.', 'Our test can be visible because Dcycle is now enabled');
   }
 
 }

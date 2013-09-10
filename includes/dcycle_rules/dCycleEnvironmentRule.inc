@@ -2,14 +2,14 @@
 
 /**
  * @file
- * Rule stating that dcycle should be aware of its (dev, prod) environment.
+ * Rule stating that Dcycle should be aware of its (dev, prod) environment.
  */
 
 // get base class
-module_load_include('inc', 'dcycle', 'includes/dcycle_rules/dcycleBaseRule');
+module_load_include('inc', 'Dcycle', 'includes/dcycle_rules/dcycleBaseRule');
 
 /**
- * Class for rule stating that dcycle should be aware of its environment.
+ * Class for rule stating that Dcycle should be aware of its environment.
  */
 class dcycleEnvironmentRule extends dcycleBaseRule {
   /**

@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Define the dcycle policy used for this
+ * Define the Dcycle policy used for this
  */
 
 function dcycle_dcycle_policy() {

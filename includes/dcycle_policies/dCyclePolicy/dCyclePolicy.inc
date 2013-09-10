@@ -2,14 +2,14 @@
 
 /**
  * @file
- * Defines the dcycle policy
+ * Defines the Dcycle policy
  */
 
 // load the base class.
-module_load_include('inc', 'dcycle', 'includes/dcycle_policies/base/dcycleQuickstartPolicy');
+module_load_include('inc', 'Dcycle', 'includes/dcycle_policies/base/dcycleQuickstartPolicy');
 
 /**
- * Defines the dcycle policy, meant to be more complete than quickstart.
+ * Defines the Dcycle policy, meant to be more complete than quickstart.
  */
 class dcyclePolicy extends dcycleQuickstartPolicy {
   /**
@@ -17,7 +17,7 @@ class dcyclePolicy extends dcycleQuickstartPolicy {
    */
   function _getRules() {
     return array_merge(parent::_getRules(), array(
-      $this->getRuleObject('dcycle', 'dcycleBranchesRule'),
+      $this->getRuleObject('Dcycle', 'dcycleBranchesRule'),
     ));
   }
 }

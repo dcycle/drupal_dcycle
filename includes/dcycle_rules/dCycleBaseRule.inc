@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Defines the dcycle policy
+ * Defines the Dcycle policy
  */
 
 /**
@@ -138,7 +138,7 @@ abstract class dcycleBaseRule {
    * Subclasses should override.
    *
    * @param $drushObject
-   *   An object as defined in dcycle.drush.inc, which you can
+   *   An object as defined in Dcycle.drush.inc, which you can
    *   call to get drush environment information such as
    *   simulate.
    */
