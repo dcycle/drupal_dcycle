@@ -1,1 +1,0 @@
-Ces tests sont confirmés fonctionnels sur http://stm.dev.tp1/
