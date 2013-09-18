@@ -34,10 +34,13 @@ function dcycle_drush_help($section) {
 }
 
 class DcycleDrushLog implements DcycleLog {
-  public function log($text, $vars) {
+  public function log($text, $vars = array()) {
+    drush_log(dt($text, $vars), 'ok');
   }
 
   public function error($text, $vars) {
+    drush_set_error('DCYCLE_ERROR', dt($text, $vars));
+    exit (1);
   }
 }
 
@@ -48,5 +51,5 @@ function drush_dcycle_test() {
   $args = func_get_args();
   $module = $args[1];
 
-  dcycle_test($module);
+  dcycle_test($module, new DcycleDrushLog);
 }

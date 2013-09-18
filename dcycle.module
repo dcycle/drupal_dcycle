@@ -7,12 +7,71 @@
  */
 
 interface DcycleLog {
-  public function log($text, $vars);
-  public function error($text, $vars);
+  public function log($text, $vars = array());
+  public function error($text, $vars = array());
 }
 
 function dcycle_test($module, $log) {
   module_enable($module);
 
-  $log->
+  if (!module_exists($module)) {
+    return $log->error('Module @module cannot be activated', array('@module' => $module));
+  }
+
+  if (!module_load_include('inc', $module, $module . '.dcycle')) {
+    return $log->error('Module @module does not have a @module.dcycle.inc file', array('@module' => $module));
+  }
+
+  $function = $module . '_dcycle_test';
+  if (!function_exists($function)) {
+    return $log->error('Function @function is not defined in the @module.dcycle.inc file', array('@function' => $function, '@module' => $module));
+  }
+
+  $info = $function();
+
+      return array(
+        'commands' => array(
+          'Run Simpletests' => array(
+            'commands' => array(
+              // cc all because otherwise the environment might not
+              // pick up new tests in the MyModule group
+              'drush cc all',
+              'drush test-run MyModule',
+            ),
+            'fail' => array(
+              grep => array(
+                '[1-9] fails',
+                '[1-9][0-9]* fails',
+                '[1-9] exceptions',
+                '[1-9][0-9]* exceptions',
+              ),
+            ),
+          ),
+          'Run Code Review' => array(
+            'commands' => array(
+              'drush coder-review --minor --comment mymodule mymodule_ui',
+            ),
+            'fail' => array(
+              grep => array(
+                '[1-9] normal warnings',
+                '[1-9][0-9]* normal warnings',
+                '[1-9] minor warnings',
+                '[1-9][0-9]* minor warnings',
+              ),
+            ),
+          ),
+        ),
+      )
+
+
+  foreach ($info['commands'] as $command_group_name => $command_info) {
+    if (is_array($command_info['command'])) {
+      foreach ($command_info['command'] as $command) {
+        $fail_patterns = array();
+        if (is_array($command_info['fail']['grep'])) {
+          $fail_patterns = $command_info['fail']['grep'];
+        }
+      }
+    }
+  }
 }
