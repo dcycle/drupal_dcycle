@@ -89,7 +89,7 @@ In the above example, you would add a file called mymodule.dcycle.inc to your pr
             ),
           ),
         ),
-      )
+      );
     }
 
 You don't need to make dcycle a dependency of your module. But, in your CI server, run:

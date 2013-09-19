@@ -12,7 +12,11 @@ interface DcycleLog {
 }
 
 function dcycle_test($module, $log) {
-  module_enable($module);
+  if (!$module) {
+    return $log->error('Please specify a module');
+  }
+
+  module_enable(array($module));
 
   if (!module_exists($module)) {
     return $log->error('Module @module cannot be activated', array('@module' => $module));
@@ -29,47 +33,50 @@ function dcycle_test($module, $log) {
 
   $info = $function();
 
-      return array(
-        'commands' => array(
-          'Run Simpletests' => array(
-            'commands' => array(
-              // cc all because otherwise the environment might not
-              // pick up new tests in the MyModule group
-              'drush cc all',
-              'drush test-run MyModule',
-            ),
-            'fail' => array(
-              grep => array(
-                '[1-9] fails',
-                '[1-9][0-9]* fails',
-                '[1-9] exceptions',
-                '[1-9][0-9]* exceptions',
-              ),
-            ),
-          ),
-          'Run Code Review' => array(
-            'commands' => array(
-              'drush coder-review --minor --comment mymodule mymodule_ui',
-            ),
-            'fail' => array(
-              grep => array(
-                '[1-9] normal warnings',
-                '[1-9][0-9]* normal warnings',
-                '[1-9] minor warnings',
-                '[1-9][0-9]* minor warnings',
-              ),
-            ),
-          ),
-        ),
-      )
-
+  foreach ($info['dependencies'] as $module => $module_info) {
+    module_enable(array($module));
+  
+    if (!module_exists($module)) {
+      return $log->error('Module @module cannot be activated', array('@module' => $module));
+    }
+  }
 
   foreach ($info['commands'] as $command_group_name => $command_info) {
-    if (is_array($command_info['command'])) {
-      foreach ($command_info['command'] as $command) {
-        $fail_patterns = array();
+    $log->log('Running command @group', array('@group' => $command_group_name));
+    if (is_array($command_info['commands'])) {
+      foreach ($command_info['commands'] as $command) {
+        $fail_patterns = array('/\[error\]/');
         if (is_array($command_info['fail']['grep'])) {
-          $fail_patterns = $command_info['fail']['grep'];
+          $fail_patterns = array_merge($fail_patterns, $command_info['fail']['grep']);
+        }
+        
+        $output = array();
+        $return = NULL;
+        exec($command, $output, $return);
+
+        /**
+         * In certain cases, the command returns an error but exec's
+         * return, the output and the $return var are empty. For example,
+         * this might happen if you call drush coder-review xyz and coder
+         * is not active.
+         */
+        if (!count($output) && !(isset($command_info['expect-no-response']))) {
+          return $log->error('The call to @command expected a response, but received none from exec()', array('@command' => $command));
+        }
+        
+        foreach ($output as $line) {
+          $log->log($line);
+          foreach ($fail_patterns as $fail_pattern) {
+            if (preg_match($fail_pattern, $line)) {
+              $fail = array(
+                'pattern' => $fail_pattern,
+                'line' => $line,
+              );
+              return $log->error('Pattern @p detected in @l', array('@p' => $fail_pattern, '@l' => $line));
+            }
+            else {
+            }
+          }
         }
       }
     }

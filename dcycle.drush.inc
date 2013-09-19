@@ -33,14 +33,22 @@ function dcycle_drush_help($section) {
   }
 }
 
-class DcycleDrushLog implements DcycleLog {
-  public function log($text, $vars = array()) {
-    drush_log(dt($text, $vars), 'ok');
-  }
-
-  public function error($text, $vars) {
-    drush_set_error('DCYCLE_ERROR', dt($text, $vars));
-    exit (1);
+// We must call interface_exists here because during the call
+// to drush en dcycle, the interface is not present yet.
+if (interface_exists('DcycleLog')) {
+  class DcycleDrushLog implements DcycleLog {
+    public function log($text, $vars = array()) {
+      drush_log(dt($text, $vars), 'ok');
+    }
+  
+    public function error($text, $vars = array()) {
+      $this->log('DCYCLE_FAILURE');
+      drush_set_error('DCYCLE_ERROR', dt($text, $vars));
+      drush_set_context('DRUSH_ERROR_CODE', 1);
+      // we need this for jenkins to get 1 to show up in $? With drush_die(1)
+      // $? returns 0 in the command line.
+      die(1);
+    }
   }
 }
 
@@ -49,7 +57,7 @@ class DcycleDrushLog implements DcycleLog {
  */
 function drush_dcycle_test() {
   $args = func_get_args();
-  $module = $args[1];
+  $module = $args[0];
 
   dcycle_test($module, new DcycleDrushLog);
 }
