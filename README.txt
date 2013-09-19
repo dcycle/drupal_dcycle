@@ -98,5 +98,11 @@ You don't need to make dcycle a dependency of your module. But, in your CI serve
     export PATH=/path/to/drush:$PATH
     
     # run our tests, running dcycle-test runs tests defined for our module
-    drush en dcycle
-    drush dcycle-test mymodule
+    drush en dcycle -y
+    [ $? = 0 ] || exit $?
+    drush cc drush
+    [ $? = 0 ] || exit $?
+    drush dcycle-test mockable
+    [ $? = 0 ] || exit $?
+
+Running [ $? = 0 ] || exit $? is required for Jenkins to report a failure when the script returns a non-zero exit code. See http://mediatribe.net/en/node/79.
