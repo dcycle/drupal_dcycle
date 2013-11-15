@@ -1,20 +1,24 @@
-How to use Dcycle, a building code for Drupal
-=============================================
+Dcycle
+======
 
 Intro
 -----
 
 Dcycle is meant to help you enforce best practices and get team members up and running fast(er) with automated testing and continuous integration.
 
+Specifically, it is meant to help enforce the practices outlined in the [Dcycle manifesto](http://dcycleproject.org/manifesto).
+
+This module is still in early development; the API, code and features are not yet stable. Please use with caution.
+
 The idea of Dcycle is that:
-* you develop on an unstable branch
-* a Jenkins server polls git for changes to your unstable branch
-* if drush dcycle-test yields no errors, your change is pushed to a (more) stable branch
+* you develop on an unstable branch.
+* a Jenkins server polls git for changes to your unstable branch.
+* if drush dcycle-test yields no errors, your change is pushed to a stable branch.
 
 Initial setup
 -------------
 
-* Make sure you have access to the command line; this works on Mac or Linux. Windows is not supported.
+* Make sure you have access to the command line.
 * You should have some knowledge of how to use drush and Drupal locally.
 * You should have some programming knowledge.
 * Make sure drush is installed and in your PATH, see http://drupal.org/project/drush for details. Typing "which drush" should give you a path.
@@ -28,9 +32,6 @@ Example usecase
 
 Your jenkins job commands might look like:
 
-    # make sure we have access to crush
-    export PATH=/path/to/drush:$PATH
-    
     # run our tests, using cc all to add new ones if necessary
     drush cc all
     drush test-run MyModule
@@ -40,7 +41,7 @@ Your jenkins job commands might look like:
 
 The above poses two problems:
 
-* First, Drush will not trigger an error if test-run or coder-review fail.
+* First, if your Jenkins server is installed on Mac OS X, Drush will not trigger an error if test-run or coder-review fail.
 * Second, the above code is not in version control.
 
 Enter Dcycle
@@ -105,4 +106,4 @@ You don't need to make dcycle a dependency of your module. But, in your CI serve
     drush dcycle-test mockable
     [ $? = 0 ] || exit $?
 
-Running [ $? = 0 ] || exit $? is required for Jenkins to report a failure when the script returns a non-zero exit code. See http://mediatribe.net/en/node/79.
+Running `[ $? = 0 ] || exit $?` is required for Jenkins to report a failure when the script returns a non-zero exit code on Mac OS X, but is not required on CentOS. See http://mediatribe.net/en/node/79.
