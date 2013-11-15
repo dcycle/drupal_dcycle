@@ -11,6 +11,20 @@ interface DcycleLog {
   public function error($text, $vars = array());
 }
 
+/**
+ * Run tests on a given module.
+ *
+ * The module must exist and have a [module].dycle.inc file which defines
+ * what should be tested and what constitutes a failure.
+ *
+ * @param $module
+ *   The module name.
+ *
+ * @log
+ *   A log object, for example DcycleDrushLog if this function is called from
+ *   drush. If you call this outside of Drush, another log object which
+ *   implements the DcycleLog interface must be defined.
+ */
 function dcycle_test($module, $log) {
   if (!$module) {
     return $log->error('Please specify a module');
@@ -33,13 +47,7 @@ function dcycle_test($module, $log) {
 
   $info = $function();
 
-  foreach ($info['dependencies'] as $module => $module_info) {
-    module_enable(array($module));
-  
-    if (!module_exists($module)) {
-      return $log->error('Module @module cannot be activated', array('@module' => $module));
-    }
-  }
+  dcycle_check_dependencies($module, $info, $log);
 
   foreach ($info['commands'] as $command_group_name => $command_info) {
     $log->log('Running command @group', array('@group' => $command_group_name));
@@ -81,4 +89,42 @@ function dcycle_test($module, $log) {
       }
     }
   }
+}
+
+function dcycle_check_dependencies($module, $info, $log) {
+  $dependencies = $info['dependencies'];
+  $info_file_path = drupal_get_path('module', $module) . '/' . $module  . '.info';
+  $infofile = drupal_parse_info_file($info_file_path);
+  $info_file_dependencies = array();
+  if (is_array($infofile['dependencies'])) {
+    $info_file_dependencies = $infofile['dependencies'];
+  }
+
+  foreach (dcycle_check_update_hook_dependencies($module) as $install_dep) {
+    if (!in_array($install_dep, $info_file_dependencies)) {
+      $install_file_path = drupal_get_path('module', $module) . '/' . $module  . '.install';
+      return $log->error('Module @module is referenced in @install but not in @info', array('@module' => $install_dep, '@install' => $install_file_path, '@info' => $info_file_path));
+    }
+  }
+
+  foreach ($info_file_dependencies as $dependency) {
+    module_enable(array($dependency));
+  
+    if (!module_exists($dependency)) {
+      return $log->error('Module @module cannot be activated, perhaps you forgot to add it to your git repo?', array('@module' => $dependency));
+    }
+  }
+}
+
+function dcycle_check_update_hook_dependencies($module) {
+  $c = file_get_contents(drupal_get_path('module', $module) . '/' . $module . '.install');
+  preg_match_all('/module_enable\(array\((.*)\)/', $c, $matches);
+  $dependencies = array();
+  foreach ($matches[1] as $match) {
+     preg_match_all('/[a-zA-Z0-9_][a-zA-Z0-9_]*/', $match, $line_dependencies);
+     foreach ($line_dependencies[0] as $line_dependency) {
+       $dependencies[] = $line_dependency;
+     }
+  }
+  return $dependencies;
 }
