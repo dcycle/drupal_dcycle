@@ -116,7 +116,19 @@ function dcycle_check_dependencies($module, $info, $log) {
   }
 }
 
-function dcycle_check_update_hook_dependencies($module) {
+/**
+ * Get all dependencies enabled by module_enable() in a module's .install file.
+ *
+ * @param $module
+ *   The machine name of your module, typically a site deployment module as
+ *   described at http://dcycleproject.org/blog/44
+ * @param $add_dependencies = FALSE
+ *   If TRUE, all dependencies of enabled modules are also returned.
+ *
+ * @return
+ *   An array of module machine names.
+ */
+function dcycle_check_update_hook_dependencies($module, $add_dependencies = FALSE) {
   $c = file_get_contents(drupal_get_path('module', $module) . '/' . $module . '.install');
   preg_match_all('/module_enable\(array\((.*)\)/', $c, $matches);
   $dependencies = array();
@@ -126,5 +138,102 @@ function dcycle_check_update_hook_dependencies($module) {
        $dependencies[] = $line_dependency;
      }
   }
+  if ($add_dependencies) {
+    // Add dependencies' dependencies.
+    dcycle_add_dependencies($dependencies);
+  }
   return $dependencies;
+}
+
+/**
+ * Given a module list, add all dependencies to the list.
+ */
+function dcycle_add_dependencies(&$module_list) {
+  // Get all module data so we can find dependencies and sort.
+  $module_data = system_rebuild_module_data();
+  // Create an associative array with weights as values.
+  $module_list = array_flip(array_values($module_list));
+  while (list($module) = each($module_list)) {
+    if (!isset($module_data[$module])) {
+      // This module is not found in the filesystem, abort.
+      return FALSE;
+    }
+    $module_list[$module] = $module_data[$module]->sort;
+
+    // Add dependencies to the list, with a placeholder weight.
+    // The new modules will be processed as the while loop continues.
+    foreach (array_keys($module_data[$module]->requires) as $dependency) {
+      if (!isset($module_list[$dependency])) {
+        $module_list[$dependency] = 0;
+      }
+    }
+  }
+}
+
+/**
+ * Enable modules fast
+ *
+ * Normally in a [site deployment module](http://dcycleproject.org/blog/44),
+ * teams often add dependencies piecemeal in hook_updates, like this:
+ *
+ * function mysite_deploy_update_7001() {
+ *   module_enable(array('i18n_menu'));
+ * }
+ *
+ * For initial deployments, one can cycle through all update hooks
+ * in the install hook like this:
+ *
+ * function mysite_deploy_install() {
+ *   for ($i = 7001; $i < 8000; $i++) {
+ *   $candidate = 'mysite_deploy_update_' . $i;
+ *   if (function_exists($candidate)) {
+ *     $candidate();
+ *   }
+ * }
+ *
+ * This causes the initial deploy time to be very long, because module_enable
+ * is called multiple times. Instead, you can make dcycle a dependency of your
+ * site deployment module and use this code:
+ *
+ * function mysite_deploy_install() {
+ *   $modules = dcycle_check_update_hook_dependencies('tremblant_deploy');
+ *   dcycle_module_enable($modules);
+ *   for ($i = 7001; $i < 8000; $i++) {
+ *   $candidate = 'mysite_deploy_update_' . $i;
+ *   if (function_exists($candidate)) {
+ *     $candidate();
+ *   }
+ * }
+ *
+ * function mysite_deploy_update_7001() {
+ *   dcycle_module_enable(array('i18n_menu'));
+ * }
+ *
+ * What happens in the above code is that all the dependencies of all calls
+ * to module_enable in your site deployment install file are calculated only
+ * once. If the update hooks are called in the same php execution, the
+ * calls to module_enable() do nothing at all.
+ *
+ * This code is experimental.
+ */
+function dcycle_module_enable($module_list, $enable_dependencies = TRUE) {
+  // These are modules enabled during the current php execution run
+  static $enabled_during_this_execution;
+  // To start with, don't enable anything.
+  $to_enable = array();
+  if (!is_array($enabled_during_this_execution)) {
+    $enabled_during_this_execution = array();
+  }
+  // For each module, first check if it already was enabled during this
+  // execution run. If it already was, don't enable it again. this causes
+  // a large gain in performance
+  foreach ($module_list as $module) {
+    if (!in_array($module, $enabled_during_this_execution)) {
+      $enabled_during_this_execution[] = $module;
+      $to_enable[] = $module;
+    }
+  }
+  if (count($to_enable)) {
+    module_enable($to_enable, $enable_dependencies);
+  }
 }
