@@ -19,6 +19,13 @@ function dcycle_drush_command() {
       'module' => 'A Drupal module.',
     ),
   );
+  $items['dcycle-check'] = array(
+    'description' => dt('Run a Check, and keep metrics and artifacts.'),
+    'bootstrap' => DRUSH_BOOTSTRAP_DRUSH,
+    'arguments' => array(
+      'module' => 'A Dcycle Check class.',
+    ),
+  );
   return $items;
 }
 
@@ -60,4 +67,14 @@ function drush_dcycle_test() {
   $module = $args[0];
 
   dcycle_test($module, new DcycleDrushLog);
+}
+
+/**
+ * Run 'dcycle-test'.
+ */
+function drush_dcycle_check() {
+  $args = func_get_args();
+  $class = $args[0];
+
+  dcycle_check($class, new DcycleDrushLog);
 }

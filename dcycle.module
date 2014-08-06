@@ -12,6 +12,42 @@ interface DcycleLog {
 }
 
 /**
+ * Implements hook_menu().
+ */
+function dcycle_menu() {
+  $items['site-version'] = array(
+    'title' => t('Site version'),
+    'page callback' => 'dcycle_page_site_version',
+    'access arguments' => array('access content'),
+    'file' => 'includes/dcycle.pages.inc',
+  );
+  return $items;
+}
+
+function dcycle_check($class, $log, $output = array()) {
+  if (!class_exists($class)) {
+    return $log->error('Cannot find specified class');
+  }
+
+  $object = new $class;
+  $object->Run();
+  $errors = $object->GetErrors();
+  if (count($errors)) {
+    return $log->error(implode(PHP_EOL, 'Cannot find specified class'));
+  }
+  $artifacts = $object->GetArtifacts();
+  $metrics = $object->GetMetrics();
+  $headers = array();
+  $values = array();
+  foreach ($metrics as $header => $value) {
+    $headers[] = $header;
+    $values[] = $value;
+    file_put_contents('ci/metrics/' . $class . '.csv', implode(PHP_EOL, array(implode(',', $headers), implode(',', $values))));
+  }
+  file_put_contents('ci/artifacts/' . $class . '/' . $class, implode(PHP_EOL, $artifacts));
+}
+
+/**
  * Run tests on a given module.
  *
  * The module must exist and have a [module].dycle.inc file which defines
@@ -237,3 +273,44 @@ function dcycle_module_enable($module_list, $enable_dependencies = TRUE) {
     module_enable($to_enable, $enable_dependencies);
   }
 }
+
+/**
+ * Implements hook_requirements().
+ */
+function dcycle_requirements($phase) {
+  $requirements = array();
+  if ($phase == 'runtime') {
+    $requirements['dcycle-version'] = array(
+      'title' => t('Site version (git)'),
+      'value' => dcycle_git_version(),
+      'weight' => -999,
+      'severity' => REQUIREMENT_INFO,
+    );
+  }
+  return $requirements;
+}
+
+/**
+ * Human-readable site version as fetched from git
+ */
+function dcycle_git_version() {
+  return DcycleGit::DisplayVersion();
+}
+
+/**
+ * Helper function for requirements
+ */
+function _tremblant_deploy_requirements() {
+  return array(
+    t('The store ID needs to be set on the !page. You can use store1/yesguy as documented !here', array('!page' => l(t('moneris admin page'), 'admin/commerce/config/payment-methods/manage/commerce_payment_commerce_moneris'), '!here' => l(t('here'), 'http://www.corecommerce.com/kb/25211/moneris_canada_e-select_plus_payment_gateway'))) => (variable_get('commerce_moneris_store_id') && variable_get('commerce_moneris_apitoken')),
+
+    t('We are using a temporary smtp account for testing, please change it') => (variable_get('smtp_username') != 'philippe.labat.local@gmail.com'),
+
+    t('Site version') => array(
+      'value' => function_exists('exec') ? exec('git log -n1 | grep commit') : t('Function exec() is used to obtain commit number, but it is not available.'),
+      'weight' => -999,
+      'type' => REQUIREMENT_INFO,
+    ),
+  );
+}
+
