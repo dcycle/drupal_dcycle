@@ -314,3 +314,66 @@ function _tremblant_deploy_requirements() {
   );
 }
 
+/**
+ * Create a new user.
+ *
+ * In simpletests, it is possible to use
+ * DrupalWebTestCase::drupalCreateUser() to create a user
+ * with given permissions. This is great for simpletest of
+ * contributed modules which define permissions. However, often
+ * when using the [Dcycle method](http://dcycleproject.org),
+ * you want to test users with roles, not permissions. This function
+ * allows you to create users with roles, but not permissions.
+ *
+ * @param $info
+ *   An associative array containing:
+ *     roles => array('role name 1', 'role name 2'),
+ *     pass_raw => TRUE|FALSE (false by default)
+ *       during tests, you might need to have access to the password
+ *       of a given user.
+ * @return
+ *   A drupal user object.
+ */
+function dcycle_create_user($info) {
+  // Code inspired by modules/simpletest/drupal_web_test_case.php
+
+  // Create a user assigned to that role.
+  $edit = array();
+  $edit['name'] = dcycle_random_name();
+  $edit['mail'] = $edit['name'] . '@example.com';
+  $edit['pass'] = user_password();
+  $edit['status'] = 1;
+  $edit['roles'] = array();
+  if (isset($info['roles'])) {
+    foreach ($info['roles'] as $role_name) {
+      $rid = user_role_load_by_name($role_name)->rid;
+      $edit['roles'][$rid] = $rid;
+    }
+  }
+
+  $account = user_save(drupal_anonymous_user(), $edit);
+
+  if (empty($account->uid)) {
+    return FALSE;
+  }
+
+  if (isset($info['pass_raw']) && $info['pass_raw']) {
+    // Add the raw password so that we can log in as this user.
+    $account->pass_raw = $edit['pass'];
+  }
+  return $account;
+}
+
+/**
+ * Returns a random name.
+ *
+ * @param $length = 8
+ *   Length of the string
+ *
+ * @return
+ *   A random name
+ */
+function dcycle_random_name($length = 8) {
+  module_load_include('php', 'simpletest', 'drupal_web_test_case');
+  return DrupalWebTestCase::randomName($length);
+}
