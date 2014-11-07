@@ -66,13 +66,13 @@ class DcycleScreenDiff extends DcycleCheck {
     $value = 0;
     foreach ($lines as $line) {
       $line = trim($line);
-      if (substr($line, 0, strlen('all :')) == 'all :') {
-        $value = substr($line, strlen('all :'));
+      if (substr($line, 0, strlen('all:')) == 'all:') {
+        $value = substr($line, strlen('all:'));
         if ($value == 'inf') {
           $value = 0;
         }
       }
     }
-    return array('difference' => 0);
+    return array('difference' => $value);
   }
 }
