@@ -24,16 +24,37 @@ function dcycle_menu() {
   return $items;
 }
 
-function dcycle_check($class, $log, $output = array()) {
+/**
+ * Run checks and save results as metrics or artifacts.
+ *
+ * @param $class
+ *   A valid class name; the class should be a subclass of DcycleCheck
+ * @param $log
+ *   An object implementing the DcycleLog interface
+ */
+function dcycle_check($class, $log) {
+  if (!$class) {
+    return $log->error('Please pass as an argument a class name which is a subclass of DcycleCheck, for example DcycleCoder');
+  }
   if (!class_exists($class)) {
-    return $log->error('Cannot find specified class');
+    return $log->error('Cannot find specified class @class', array('@class' => $class));
+  }
+  if (!is_subclass_of($class, 'DcycleCheck')) {
+    return $log->error('@class is not a subclass of DcycleCheck', array('@class' => $class));
+  }
+  foreach (array('public://ci/metrics', 'public://ci/artifacts', 'public://ci/artifacts/' . $class) as $uri) {
+    if (!file_prepare_directory($uri)) {
+      return $log->error('Cannot create directory @uri, please consider making it yourself on the command line.', array('@uri' => $uri));
+    }
   }
 
   $object = new $class;
   $object->Run();
   $errors = $object->GetErrors();
   if (count($errors)) {
-    return $log->error(implode(PHP_EOL, 'Cannot find specified class'));
+    foreach ($errors as $error) {
+      return $log->error($error);
+    }
   }
   $artifacts = $object->GetArtifacts();
   $metrics = $object->GetMetrics();
@@ -42,9 +63,11 @@ function dcycle_check($class, $log, $output = array()) {
   foreach ($metrics as $header => $value) {
     $headers[] = $header;
     $values[] = $value;
-    file_put_contents('ci/metrics/' . $class . '.csv', implode(PHP_EOL, array(implode(',', $headers), implode(',', $values))));
   }
-  file_put_contents('ci/artifacts/' . $class . '/' . $class, implode(PHP_EOL, $artifacts));
+  file_put_contents('public://ci/metrics/' . $class . '.csv', implode(PHP_EOL, array(implode(',', $headers), implode(',', $values))));
+  $dir = 'public://ci/artifacts/' . $class;
+  file_prepare_directory($dir);
+  file_put_contents($dir . '/' . $class, implode(PHP_EOL, $artifacts));
 }
 
 /**
@@ -93,7 +116,7 @@ function dcycle_test($module, $log) {
         if (is_array($command_info['fail']['grep'])) {
           $fail_patterns = array_merge($fail_patterns, $command_info['fail']['grep']);
         }
-        
+
         $output = array();
         $return = NULL;
         exec($command, $output, $return);
@@ -107,7 +130,7 @@ function dcycle_test($module, $log) {
         if (!count($output) && !(isset($command_info['expect-no-response']))) {
           return $log->error('The call to @command expected a response, but received none from exec()', array('@command' => $command));
         }
-        
+
         foreach ($output as $line) {
           $log->log($line);
           foreach ($fail_patterns as $fail_pattern) {
@@ -145,7 +168,7 @@ function dcycle_check_dependencies($module, $info, $log) {
 
   foreach ($info_file_dependencies as $dependency) {
     module_enable(array($dependency));
-  
+
     if (!module_exists($dependency)) {
       return $log->error('Module @module cannot be activated, perhaps you forgot to add it to your git repo?', array('@module' => $dependency));
     }
@@ -376,4 +399,34 @@ function dcycle_create_user($info) {
 function dcycle_random_name($length = 8) {
   module_load_include('php', 'simpletest', 'drupal_web_test_case');
   return DrupalWebTestCase::randomName($length);
+}
+
+/**
+ * Helper Function to disable blocks
+ * Modified from http://dcycleproject.org/blog/32/disabling-blocks
+ * @param  string $theme  The name of the theme you'd like the block to be disabled on
+ * @param  array $blocks Array of blocks. Module => Block name
+ */
+function dcycle_disable_block($theme, $blocks) {
+  foreach ($blocks as $module => $delta) {
+    $num_updated = db_update('block') // Table name no longer needs {}
+      ->fields(array(
+        'region' => '-1',
+      ))
+      ->condition('module', $module, '=')
+      ->condition('delta', $delta, '=')
+      ->condition('theme', $theme, '=')
+      ->execute();
+    if (!$num_updated) {
+      db_insert('block') // Table name no longer needs {}
+        ->fields(array(
+          'region' => '-1',
+          'module' => $module,
+          'delta' => $delta,
+          'theme' => $theme,
+          'pages' => '',
+        ))
+        ->execute();
+    }
+  }
 }

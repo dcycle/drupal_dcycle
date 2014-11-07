@@ -9,11 +9,24 @@ abstract class DcycleCheck {
   private function Preflight() {
     return $this->_Preflight_();
   }
+
+  /**
+   * Run the check if the preflight is OK.
+   */
   function Run() {
     if ($this->Preflight()) {
       return $this->_Run_();
     }
   }
+
+  static function loadXML($uri) {
+    $return = simplexml_load_file($uri);
+    if (!$return) {
+      throw new Exception('Could not load XML file');
+    }
+    return $return;
+  }
+
   function GetArtifacts() {
     self::MakeArray($this->artifacts);
     return $this->artifacts;
@@ -51,5 +64,9 @@ abstract class DcycleCheck {
   }
 
   abstract function _Preflight_();
+
+  /**
+   * The actual code to run this check.
+   */
   abstract function _Run_();
 }

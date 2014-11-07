@@ -22,10 +22,13 @@ class DcycleCoder extends DcycleCheck {
     return TRUE;
   }
 
+  /**
+   * The actual code to run this check.
+   */
   function _Run_() {
     $lines = array();
     // see https://www.drupal.org/node/2316653
-    DcycleEnvironment::DrushCommand('coder --minor sites/all/modules/custom/*/*.module sites/all/modules/custom', $lines);
+    DcycleEnvironment::DrushCommand('coder --minor sites/all/modules/custom/*/*.module sites/all/modules/custom 2> /dev/null', $lines);
     $this->AddArtifact(self::ParseArtifacts($lines));
     $this->AddMetric(self::ParseMetrics($lines));
     return $lines;
@@ -39,10 +42,10 @@ class DcycleCoder extends DcycleCheck {
     $metrics = array();
     foreach ($lines as $line) {
       if (drupal_substr(trim($line), 0, strlen('Coder found')) == 'Coder found') {
-        foreach (array('normal', 'minor') as $type) {
+        foreach (array('', 'minor ') as $type) {
           $matches = array();
-          if (preg_match('/([0-9]*) ' . $type . ' warnings/', $line, $matches)) {
-            $metrics[$type . ' coder warnings'] = $matches[1];
+          if (preg_match('/([0-9]*) ' . $type . 'warnings/', $line, $matches)) {
+            $metrics[$type . 'coder warnings'] = $matches[1];
           }
         }
       }

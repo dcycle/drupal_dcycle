@@ -5,6 +5,6 @@ function dcycle_page_site_version() {
     return dcycle_git_version();
   }
   else {
-    return t('Cannot display site version because the dcycle_show_site_version is set to FALSE.');
+    return t('Cannot display site version because the dcycle_show_site_version variable is set to FALSE.');
   }
 }

@@ -5,5 +5,10 @@ core = 7.x
 
 files[] = includes/classes/DcycleEnvironment.inc
 files[] = includes/classes/DcycleGit.inc
+files[] = includes/classes/DcycleGitDiff.inc
 files[] = includes/classes/DcycleCheck.inc
 files[] = includes/classes/DcycleCoder.inc
+files[] = includes/classes/DcyclePdepend.inc
+files[] = includes/classes/DcycleDuplicateCode.inc
+files[] = includes/classes/DcycleScreenDiff.inc
+files[] = includes/classes/DcycleSimpletest.inc

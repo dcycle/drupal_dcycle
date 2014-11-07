@@ -47,14 +47,11 @@ if (interface_exists('DcycleLog')) {
     public function log($text, $vars = array()) {
       drush_log(dt($text, $vars), 'ok');
     }
-  
+
     public function error($text, $vars = array()) {
       $this->log('DCYCLE_FAILURE');
       drush_set_error('DCYCLE_ERROR', dt($text, $vars));
       drush_set_context('DRUSH_ERROR_CODE', 1);
-      // we need this for jenkins to get 1 to show up in $? With drush_die(1)
-      // $? returns 0 in the command line.
-      die(1);
     }
   }
 }
@@ -74,7 +71,9 @@ function drush_dcycle_test() {
  */
 function drush_dcycle_check() {
   $args = func_get_args();
-  $class = $args[0];
+  $class = isset($args[0]) ? $args[0] : NULL;
 
-  dcycle_check($class, new DcycleDrushLog);
+  $log = new DcycleDrushLog;
+
+  return dcycle_check($class, $log);
 }
