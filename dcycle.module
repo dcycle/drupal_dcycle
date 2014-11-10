@@ -408,25 +408,30 @@ function dcycle_random_name($length = 8) {
  * @param  array $blocks Array of blocks. Module => Block name
  */
 function dcycle_disable_block($theme, $blocks) {
-  foreach ($blocks as $module => $delta) {
-    $num_updated = db_update('block') // Table name no longer needs {}
-      ->fields(array(
-        'region' => '-1',
-      ))
-      ->condition('module', $module, '=')
-      ->condition('delta', $delta, '=')
-      ->condition('theme', $theme, '=')
-      ->execute();
-    if (!$num_updated) {
-      db_insert('block') // Table name no longer needs {}
+  try {
+    foreach ($blocks as $module => $delta) {
+      $num_updated = db_update('block') // Table name no longer needs {}
         ->fields(array(
           'region' => '-1',
-          'module' => $module,
-          'delta' => $delta,
-          'theme' => $theme,
-          'pages' => '',
         ))
+        ->condition('module', $module, '=')
+        ->condition('delta', $delta, '=')
+        ->condition('theme', $theme, '=')
         ->execute();
+      if (!$num_updated) {
+        db_insert('block') // Table name no longer needs {}
+          ->fields(array(
+            'region' => '-1',
+            'module' => $module,
+            'delta' => $delta,
+            'theme' => $theme,
+            'pages' => '',
+          ))
+          ->execute();
+      }
     }
+  }
+  catch (Exception $e) {
+    return;
   }
 }
