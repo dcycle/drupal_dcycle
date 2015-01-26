@@ -38,11 +38,26 @@ class DcycleCoder extends DcycleCheck {
     return implode(PHP_EOL, $lines);
   }
 
+  /**
+   * Takes console output from drush coder-review and formats the data
+   *
+   * @param $lines
+   *   The result of "drush coder --minor", with each line being an array member.
+   *
+   * @return
+   *   An associative array which looks like:
+   *      array(2) {
+   *        'coder warnings' =>
+   *        string(0) ""
+   *        'minor coder warnings' =>
+   *        string(1) "4"
+   *      }
+   */
   static function ParseMetrics($lines) {
     $metrics = array();
     foreach ($lines as $line) {
       if (drupal_substr(trim($line), 0, strlen('Coder found')) == 'Coder found') {
-        foreach (array('', 'minor ') as $type) {
+        foreach (array('normal ', 'minor ') as $type) {
           $matches = array();
           if (preg_match('/([0-9]*) ' . $type . 'warnings/', $line, $matches)) {
             $metrics[$type . 'coder warnings'] = $matches[1];
