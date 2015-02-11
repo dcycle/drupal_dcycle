@@ -42,9 +42,15 @@ function dcycle_check($class, $log) {
   if (!is_subclass_of($class, 'DcycleCheck')) {
     return $log->error('@class is not a subclass of DcycleCheck', array('@class' => $class));
   }
-  foreach (array('public://ci/metrics', 'public://ci/artifacts', 'public://ci/artifacts/' . $class) as $uri) {
+  $uri_base = 'public://';
+  $full = drupal_realpath($uri_base);
+  if (!$full) {
+    return $log->error('drupal_realpath() returned FALSE for @uri_base, which signals that you are using a non-standard setup for files, which is not supported by Dcycle. Please open an issue on Drupal.org if one does not exist yet', array('@uri_base' => $uri_base));
+  }
+  foreach (array('ci/metrics', 'ci/artifacts', 'ci/artifacts/' . $class) as $path) {
+    $uri = $uri_base . $path;
     if (!file_prepare_directory($uri)) {
-      return $log->error('Cannot create directory @uri, please consider making it yourself on the command line.', array('@uri' => $uri));
+      return $log->error('Cannot create directory @uri, please consider making it yourself on the command line:' . PHP_EOL . 'mkdir -p @full', array('@uri' => $uri, '@full' => $full . '/' . $path));
     }
   }
 
