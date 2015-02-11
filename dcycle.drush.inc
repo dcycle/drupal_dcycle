@@ -23,7 +23,7 @@ function dcycle_drush_command() {
     'description' => dt('Run a Check, and keep metrics and artifacts.'),
     'bootstrap' => DRUSH_BOOTSTRAP_DRUSH,
     'arguments' => array(
-      'module' => 'A Dcycle Check class.',
+      'module' => 'A Dcycle Check class, for example DcycleCoder to run code review.',
     ),
   );
   return $items;
@@ -36,6 +36,10 @@ function dcycle_drush_help($section) {
   switch ($section) {
     case 'drush:dcycle-test':
       $help = dt('Runs tests as defined in module.drush.inc.');
+      return $help;
+    case 'drush:dcycle-check':
+      $help = dt('Runs checks on your code and keep the artifacts and metrics. For example, you can run
+      drush dcycle-check DcycleCoder or drush dcycle-check DcycleCoder "sites/all/modules/custom sites/all/modules/mymodule_not_in_custom_folder". For most metrics, if a list of modules is not provided, sites/all/modules/custom is assumed');
       return $help;
   }
 }
@@ -72,8 +76,8 @@ function drush_dcycle_test() {
 function drush_dcycle_check() {
   $args = func_get_args();
   $class = isset($args[0]) ? $args[0] : NULL;
-
   $log = new DcycleDrushLog;
 
-  return dcycle_check($class, $log);
+  array_shift($args);
+  return dcycle_check($class, $log, $args);
 }

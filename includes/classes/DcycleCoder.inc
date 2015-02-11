@@ -28,10 +28,37 @@ class DcycleCoder extends DcycleCheck {
   function _Run_() {
     $lines = array();
     // see https://www.drupal.org/node/2316653
-    DcycleEnvironment::DrushCommand('coder --minor sites/all/modules/custom/*/*.module sites/all/modules/custom 2> /dev/null', $lines);
+    DcycleEnvironment::DrushCommand('coder --minor ' .  $this->GetLocations(). ' 2> /dev/null', $lines);
     $this->AddArtifact(self::ParseArtifacts($lines));
     $this->AddMetric(self::ParseMetrics($lines));
     return $lines;
+  }
+
+  /**
+   * Returns where to review code
+   *
+   * You will typically invoke this by calling
+   *
+   *     drush dcycle-check DcycleCoder
+   *
+   * or
+   *
+   *     drush dcycle-check DcycleCoder "sites/all/modules/location1 sites/all/module2"
+   *
+   * If no location is specified in Drush, we will default to testing
+   * sites/all/modules/custom.
+   *
+   * @return
+   *   The locations to review code, as a string which will be passed to coder.
+   */
+  public function GetLocations() {
+    $args = $this->GetArgs();
+    if ($args[0]) {
+      return $args[0];
+    }
+    else {
+      return 'sites/all/modules/custom/*/*.module sites/all/modules/custom';
+    }
   }
 
   static function ParseArtifacts($lines) {

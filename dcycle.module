@@ -31,8 +31,23 @@ function dcycle_menu() {
  *   A valid class name; the class should be a subclass of DcycleCheck
  * @param $log
  *   An object implementing the DcycleLog interface
+ * @param $args
+ *   Arguments in the format:
+ *     Array
+ *     (
+ *         [0] => arg1
+ *         [1] => arg2
+ *         [2] => arg3
+ *         [3] => arg4
+ *     )
+ *   For example, if this is called via drush dcycle-check Class arg1 arg2 you will get
+ *     Array
+ *     (
+ *         [0] => arg1
+ *         [1] => arg2
+ *     )
  */
-function dcycle_check($class, $log) {
+function dcycle_check($class, $log, $args) {
   if (!$class) {
     return $log->error('Please pass as an argument a class name which is a subclass of DcycleCheck, for example DcycleCoder');
   }
@@ -54,7 +69,7 @@ function dcycle_check($class, $log) {
     }
   }
 
-  $object = new $class;
+  $object = new $class($args);
   $object->Run();
   $errors = $object->GetErrors();
   if (count($errors)) {

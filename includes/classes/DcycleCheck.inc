@@ -5,6 +5,58 @@ abstract class DcycleCheck {
   private $artifacts;
   private $errors;
   private $preflight;
+  // Arguments used when creating the class, see the contructor
+  private $args;
+
+  /**
+   * Constructor
+   *
+   * @param $args
+   *   Arguments in the format:
+   *     Array
+   *     (
+   *         [0] => arg1
+   *         [1] => arg2
+   *         [2] => arg3
+   *         [3] => arg4
+   *     )
+   *   For example, if this is called via drush dcycle-check Class arg1 arg2 you will get
+   *     Array
+   *     (
+   *         [0] => arg1
+   *         [1] => arg2
+   *     )
+   */
+  public function __construct($args) {
+    $this->args = $args;
+  }
+
+  /**
+   * Getter for the args
+   *
+   * The args are passed on construction and can be used when running or
+   * preflighting the command. Subclasses will typically call this. See DcycleCoder
+   * for example usage.
+   *
+   * @return
+   *   Arguments in the format:
+   *     Array
+   *     (
+   *         [0] => arg1
+   *         [1] => arg2
+   *         [2] => arg3
+   *         [3] => arg4
+   *     )
+   *   For example, if this is called via drush dcycle-check Class arg1 arg2 you will get
+   *     Array
+   *     (
+   *         [0] => arg1
+   *         [1] => arg2
+   *     )
+   */
+  public function GetArgs() {
+    return $this->args;
+  }
 
   private function Preflight() {
     return $this->_Preflight_();
